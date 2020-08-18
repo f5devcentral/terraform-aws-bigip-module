@@ -1,7 +1,7 @@
 variable "prefix" {
   description = "Prefix for resources created by this module"
   type        = string
-  default     = "terraform-aws-bigip-demo"
+  default     = "tf-aws-bigip"
 }
 
 variable "f5_ami_search_name" {
@@ -31,6 +31,7 @@ variable "ec2_instance_type" {
 variable "ec2_key_name" {
   description = "AWS EC2 Key name for SSH access"
   type        = string
+  default = "tf-demo-key"
 }
 
 variable "mgmt_eip" {
