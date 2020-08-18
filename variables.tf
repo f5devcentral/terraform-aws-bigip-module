@@ -25,7 +25,7 @@ variable "application_endpoint_count" {
 variable "ec2_instance_type" {
   description = "AWS EC2 instance type"
   type        = string
-  default     = "m4.large"
+  default     = "m5.large"
 }
 
 variable "ec2_key_name" {

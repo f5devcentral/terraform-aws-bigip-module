@@ -1,5 +1,5 @@
 provider "aws" {
-  region = local.region
+  region = var.region
 }
 
 #
@@ -34,15 +34,15 @@ resource "aws_secretsmanager_secret_version" "bigip-pwd" {
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
 
-  name                 = format("%s-vpc-%s", local.prefix, random_id.id.hex)
-  cidr                 = local.cidr
+  name                 = format("%s-vpc-%s", var.prefix, random_id.id.hex)
+  cidr                 = var.cidr
   enable_dns_hostnames = true
   enable_dns_support   = true
 
-  azs = local.azs
+  azs = var.availabilityZones
 
   tags = {
-    Name        = format("%s-vpc-%s", local.prefix, random_id.id.hex)
+    Name        = format("%s-vpc-%s", var.prefix, random_id.id.hex)
     Terraform   = "true"
     Environment = "dev"
   }
@@ -66,7 +66,7 @@ resource "aws_route_table" "internet-gw" {
 resource "aws_subnet" "mgmt" {
   vpc_id     = module.vpc.vpc_id
   cidr_block = "10.0.1.0/24"
-  availability_zone = "us-east-2a"
+  availability_zone = "us-east-1a"
 
   tags = {
     Name = "management"
@@ -75,7 +75,7 @@ resource "aws_subnet" "mgmt" {
 resource "aws_subnet" "external-public" {
   vpc_id     = module.vpc.vpc_id
   cidr_block = "10.0.2.0/24"
-  availability_zone = "us-east-2a"
+  availability_zone = "us-east-1a"
 
   tags = {
     Name = "external"
@@ -84,7 +84,7 @@ resource "aws_subnet" "external-public" {
 resource "aws_subnet" "internal" {
   vpc_id     = module.vpc.vpc_id
   cidr_block = "10.0.3.0/24"
-   availability_zone = "us-east-2a"
+   availability_zone = "us-east-1a"
 
   tags = {
     Name = "internal"
@@ -147,7 +147,6 @@ module "internal-network-security-group-public" {
 }
 resource "tls_private_key" "example" {
   algorithm   = "RSA"
-  //ecdsa_curve = "P384"
 }
 
 
@@ -165,32 +164,27 @@ module bigip {
 
   prefix = format(
     "%s-bigip-3-nic_with_new_vpc-%s",
-    local.prefix,
+    var.prefix,
     random_id.id.hex
   )
   f5_instance_count           = 1
-  ec2_instance_type           = "m5.large"
   ec2_key_name                = aws_key_pair.generated_key.key_name
   aws_secretmanager_secret_id = aws_secretsmanager_secret.bigip.id
-  mgmt_subnet_security_group_ids  = [module.mgmt-network-security-group.this_security_group_id]
+  mgmt_securitygroup_id  = [module.mgmt-network-security-group.this_security_group_id]
 
-  public_subnet_security_group_ids = [module.external-network-security-group-public.this_security_group_id]
+  external_securitygroup_id = [module.external-network-security-group-public.this_security_group_id]
 
-  private_subnet_security_group_ids = [module.internal-network-security-group-public.this_security_group_id]
+  internal_securitygroup_id = [module.internal-network-security-group-public.this_security_group_id]
 
-  vpc_public_subnet_ids  = [{ "subnet_id" = aws_subnet.external-public.id, "public_ip" = true }]
-  vpc_private_subnet_ids   = [{ "subnet_id" = aws_subnet.internal.id, "public_ip" = false }]
-  vpc_mgmt_subnet_ids     = [{ "subnet_id" = aws_subnet.mgmt.id, "public_ip" = true }]
+  external_subnet_id  = [{ "subnet_id" = aws_subnet.external-public.id, "public_ip" = true }]
+  internal_subnet_id   = [{ "subnet_id" = aws_subnet.internal.id, "public_ip" = false }]
+  mgmt_subnet_id    = [{ "subnet_id" = aws_subnet.mgmt.id, "public_ip" = true }]
 }
 
 #
 # Variables used by this example
 #
 locals {
-  prefix            = "tf-aws-bigip"
-  region            = "us-east-2"
-  azs               = [format("%s%s", local.region, "a"), format("%s%s", local.region, "b")]
-  cidr              = "10.0.0.0/16"
   allowed_mgmt_cidr = "0.0.0.0/0"
   allowed_app_cidr  = "0.0.0.0/0"
 }
