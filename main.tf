@@ -1,3 +1,91 @@
+locals {
+ bigip_map = {
+    "mgmt_subnet_id"            = var.mgmt_subnet_id
+    "mgmt_securitygroup_id"     = var.mgmt_securitygroup_id
+    "external_subnet_id"        = var.external_subnet_id
+    "external_securitygroup_id" = var.external_securitygroup_id
+    "internal_subnet_id"        = var.internal_subnet_id
+    "internal_securitygroup_id" = var.internal_securitygroup_id
+  }
+  mgmt_public_subnet_id = [
+    for subnet in local.bigip_map["mgmt_subnet_id"] :
+    subnet["subnet_id"]
+    if subnet["public_ip"] == true
+  ]
+  mgmt_public_index = [
+    for index, subnet in local.bigip_map["mgmt_subnet_id"] :
+    index
+    if subnet["public_ip"] == true
+  ]
+  mgmt_public_security_id = [
+    for i in local.mgmt_public_index : local.bigip_map["mgmt_securitygroup_id"][i]
+  ]
+  mgmt_private_subnet_id = [
+    for subnet in local.bigip_map["mgmt_subnet_id"] :
+    subnet["subnet_id"]
+    if subnet["public_ip"] == false
+  ]
+  mgmt_private_index = [
+    for index, subnet in local.bigip_map["mgmt_subnet_id"] :
+    index
+    if subnet["public_ip"] == false
+  ]
+  mgmt_private_security_id = [
+    for i in local.external_private_index : local.bigip_map["mgmt_securitygroup_id"][i]
+  ]
+  external_public_subnet_id = [
+    for subnet in local.bigip_map["external_subnet_id"] :
+    subnet["subnet_id"]
+    if subnet["public_ip"] == true
+  ]
+  external_public_index = [
+    for index, subnet in local.bigip_map["external_subnet_id"] :
+    index
+    if subnet["public_ip"] == true
+  ]
+  external_public_security_id = [
+    for i in local.external_public_index : local.bigip_map["external_securitygroup_id"][i]
+  ]
+  external_private_subnet_id = [
+    for subnet in local.bigip_map["external_subnet_id"] :
+    subnet["subnet_id"]
+    if subnet["public_ip"] == false
+  ]
+  external_private_index = [
+    for index, subnet in local.bigip_map["external_subnet_id"] :
+    index
+    if subnet["public_ip"] == false
+  ]
+  external_private_security_id = [
+    for i in local.external_private_index : local.bigip_map["external_securitygroup_id"][i]
+  ]
+  internal_public_subnet_id = [
+    for subnet in local.bigip_map["internal_subnet_id"] :
+    subnet["subnet_id"]
+    if subnet["public_ip"] == true
+  ]
+  internal_public_index = [
+    for index, subnet in local.bigip_map["internal_subnet_id"] :
+    index
+    if subnet["public_ip"] == true
+  ]
+  internal_public_security_id = [
+    for i in local.internal_public_index : local.bigip_map["internal_securitygroup_id"][i]
+  ]
+  internal_private_subnet_id = [
+    for subnet in local.bigip_map["internal_subnet_id"] :
+    subnet["subnet_id"]
+    if subnet["public_ip"] == false
+  ]
+  internal_private_index = [
+    for index, subnet in local.bigip_map["internal_subnet_id"] :
+    index
+    if subnet["public_ip"] == false
+  ]
+  internal_private_security_id = [
+    for i in local.internal_private_index : local.bigip_map["internal_securitygroup_id"][i]
+  ]
+}
 #
 # Ensure Secret exists
 #
@@ -24,9 +112,9 @@ data "aws_ami" "f5_ami" {
 # Create Management Network Interfaces
 #
 resource "aws_network_interface" "mgmt" {
-  count           = length(var.vpc_mgmt_subnet_ids)
-  subnet_id       = var.vpc_mgmt_subnet_ids[count.index]
-  security_groups = var.mgmt_subnet_security_group_ids
+  count           = length(local.bigip_map["mgmt_subnet_id"])
+  subnet_id       = local.bigip_map["mgmt_subnet_id"][count.index]["subnet_id"]
+  security_groups = var.mgmt_securitygroup_id
 }
 
 
@@ -34,7 +122,7 @@ resource "aws_network_interface" "mgmt" {
 # add an elastic IP to the BIG-IP management interface
 #
 resource "aws_eip" "mgmt" {
-  count             = var.mgmt_eip ? length(var.vpc_mgmt_subnet_ids) : 0
+  count             = var.mgmt_eip ? length(var.external_subnet_id) : 0
   network_interface = aws_network_interface.mgmt[count.index].id
   vpc               = true
 }
@@ -43,9 +131,9 @@ resource "aws_eip" "mgmt" {
 # Create Public Network Interfaces
 #
 resource "aws_network_interface" "public" {
-  count             = length(var.vpc_public_subnet_ids)
-  subnet_id         = var.vpc_public_subnet_ids[count.index]
-  security_groups   = var.public_subnet_security_group_ids
+  count             = length(local.external_public_subnet_id)
+  subnet_id         = local.external_public_subnet_id[count.index]
+  security_groups   = var.external_securitygroup_id
   private_ips_count = var.application_endpoint_count
 }
 
@@ -53,9 +141,9 @@ resource "aws_network_interface" "public" {
 # Create Private Network Interfaces
 #
 resource "aws_network_interface" "private" {
-  count           = length(var.vpc_private_subnet_ids)
-  subnet_id       = var.vpc_private_subnet_ids[count.index]
-  security_groups = var.private_subnet_security_group_ids
+  count           = length(local.internal_private_subnet_id)
+  subnet_id       = local.internal_private_subnet_id[count.index]
+  security_groups = var.internal_securitygroup_id
 }
 
 

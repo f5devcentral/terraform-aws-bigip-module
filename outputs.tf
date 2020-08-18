@@ -13,7 +13,7 @@ output "mgmt_public_dns" {
 # BIG-IP Management Port
 output "mgmt_port" {
   description = "HTTPS Port used for the BIG-IP management interface"
-  value       = length(var.vpc_public_subnet_ids) > 0 ? "443" : "8443"
+  value       = length(var.external_subnet_id) > 0 ? "443" : "8443"
 }
 
 # Public Network Interface

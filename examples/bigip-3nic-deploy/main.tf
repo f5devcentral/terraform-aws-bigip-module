@@ -172,15 +172,15 @@ module bigip {
   ec2_instance_type           = "m5.large"
   ec2_key_name                = aws_key_pair.generated_key.key_name
   aws_secretmanager_secret_id = aws_secretsmanager_secret.bigip.id
-  mgmt_subnet_security_group_ids = [module.mgmt-network-security-group.this_security_group_id]
+  mgmt_subnet_security_group_ids  = [module.mgmt-network-security-group.this_security_group_id]
 
   public_subnet_security_group_ids = [module.external-network-security-group-public.this_security_group_id]
 
   private_subnet_security_group_ids = [module.internal-network-security-group-public.this_security_group_id]
 
-  vpc_public_subnet_ids  = [aws_subnet.external-public.id]
-  vpc_private_subnet_ids = [aws_subnet.internal.id]
-  vpc_mgmt_subnet_ids    = [aws_subnet.mgmt.id]
+  vpc_public_subnet_ids  = [{ "subnet_id" = aws_subnet.external-public.id, "public_ip" = true }]
+  vpc_private_subnet_ids   = [{ "subnet_id" = aws_subnet.internal.id, "public_ip" = false }]
+  vpc_mgmt_subnet_ids     = [{ "subnet_id" = aws_subnet.mgmt.id, "public_ip" = true }]
 }
 
 #

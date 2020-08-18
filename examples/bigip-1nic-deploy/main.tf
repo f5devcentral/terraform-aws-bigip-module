@@ -115,9 +115,9 @@ module bigip {
   f5_instance_count           = 1
   ec2_key_name                = aws_key_pair.generated_key.key_name
   aws_secretmanager_secret_id = aws_secretsmanager_secret.bigip.id
-  mgmt_subnet_security_group_ids = [module.mgmt-network-security-group.this_security_group_id]
+  mgmt_securitygroup_id = [module.mgmt-network-security-group.this_security_group_id]
 
-  vpc_mgmt_subnet_ids    = [aws_subnet.mgmt.id]
+  mgmt_subnet_id    = [{ "subnet_id" = aws_subnet.mgmt.id, "public_ip" = true }]
 }
 
 #

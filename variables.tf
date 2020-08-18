@@ -33,51 +33,56 @@ variable "ec2_key_name" {
   type        = string
 }
 
-variable "vpc_public_subnet_ids" {
-  description = "AWS VPC Subnet id for the public subnet"
-  type        = list
-  default     = []
-}
-
-variable "vpc_private_subnet_ids" {
-  description = "AWS VPC Subnet id for the private subnet"
-  type        = list
-  default     = []
-}
-
-variable "vpc_mgmt_subnet_ids" {
-  description = "AWS VPC Subnet id for the management subnet"
-  type        = list
-  default     = []
-}
-
 variable "mgmt_eip" {
   description = "Enable an Elastic IP address on the management interface"
   type        = bool
   default     = true
 }
-
-variable "mgmt_subnet_security_group_ids" {
-  description = "AWS Security Group ID for BIG-IP management interface"
-  type        = list
-  default     = []
-}
-
-variable "public_subnet_security_group_ids" {
-  description = "AWS Security Group ID for BIG-IP public interface"
-  type        = list
-  default     = []
-}
-
-variable "private_subnet_security_group_ids" {
-  description = "AWS Security Group ID for BIG-IP private interface"
-  type        = list
-  default     = []
-}
-
 variable "aws_secretmanager_secret_id" {
   description = "AWS Secret Manager Secret ID that stores the BIG-IP password"
   type        = string
 }
 
+variable mgmt_subnet_id {
+  description = "The subnet id of the virtual network where the virtual machines will reside."
+  type = list(object({
+    subnet_id = string
+    public_ip = bool
+  }))
+}
 
+variable external_subnet_id {
+  description = "The subnet id of the virtual network where the virtual machines will reside."
+  type = list(object({
+    subnet_id = string
+    public_ip = bool
+  }))
+  default = [{ "subnet_id" = null, "public_ip" = null }]
+}
+
+variable internal_subnet_id {
+  description = "The subnet id of the virtual network where the virtual machines will reside."
+  type = list(object({
+    subnet_id = string
+    public_ip = bool
+  }))
+  default = [{ "subnet_id" = null, "public_ip" = null }]
+}
+
+
+variable mgmt_securitygroup_id {
+  description = "The Network Security Group ids for management network "
+  type        = list(string)
+}
+
+variable external_securitygroup_id {
+  description = "The Network Security Group ids for external network "
+  type        = list(string)
+  default     = []
+}
+
+variable internal_securitygroup_id {
+  description = "The Network Security Group ids for internal network "
+  type        = list(string)
+  default     = []
+}
