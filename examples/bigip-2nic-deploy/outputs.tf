@@ -1,7 +1,3 @@
-# VPC
-output "vpc_id" {
-  value = module.vpc.vpc_id
-}
 
 # BIG-IP Management Public IP Addresses
 output "bigip_mgmt_ips" {
