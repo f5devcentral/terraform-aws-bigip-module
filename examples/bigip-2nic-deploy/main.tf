@@ -65,8 +65,8 @@ resource "aws_route_table" "internet-gw" {
 }
 
 resource "aws_subnet" "mgmt" {
-  vpc_id     = module.vpc.vpc_id
-  cidr_block = "10.0.1.0/24"
+  vpc_id            = module.vpc.vpc_id
+  cidr_block        = "10.0.1.0/24"
   availability_zone = "us-east-1a"
 
   tags = {
@@ -74,8 +74,8 @@ resource "aws_subnet" "mgmt" {
   }
 }
 resource "aws_subnet" "external-public" {
-  vpc_id     = module.vpc.vpc_id
-  cidr_block = "10.0.2.0/24"
+  vpc_id            = module.vpc.vpc_id
+  cidr_block        = "10.0.2.0/24"
   availability_zone = "us-east-1a"
 
   tags = {
@@ -119,14 +119,14 @@ module "mgmt-network-security-group" {
 }
 
 resource "tls_private_key" "example" {
-  algorithm   = "RSA"
+  algorithm = "RSA"
   //ecdsa_curve = "P384"
 }
 
 
 
 resource "aws_key_pair" "generated_key" {
-  key_name   = "${var.ec2_key_name}"
+  key_name   = format("%s-%s-%s", var.prefix, var.ec2_key_name, random_id.id.hex)
   public_key = "${tls_private_key.example.public_key_openssh}"
 }
 #
@@ -143,12 +143,12 @@ module bigip {
   f5_instance_count           = 1
   ec2_key_name                = aws_key_pair.generated_key.key_name
   aws_secretmanager_secret_id = aws_secretsmanager_secret.bigip.id
-  mgmt_securitygroup_id = [module.mgmt-network-security-group.this_security_group_id]
+  mgmt_securitygroup_id       = [module.mgmt-network-security-group.this_security_group_id]
 
   external_securitygroup_id = [module.external-network-security-group-public.this_security_group_id]
 
-  external_subnet_id   = [{ "subnet_id" = aws_subnet.external-public.id, "public_ip" = true }]
-  mgmt_subnet_id    = [{ "subnet_id" = aws_subnet.mgmt.id, "public_ip" = true }]
+  external_subnet_id = [{ "subnet_id" = aws_subnet.external-public.id, "public_ip" = true }]
+  mgmt_subnet_id     = [{ "subnet_id" = aws_subnet.mgmt.id, "public_ip" = true }]
 }
 
 #

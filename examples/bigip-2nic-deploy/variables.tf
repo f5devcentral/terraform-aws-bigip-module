@@ -1,7 +1,7 @@
 variable "ec2_key_name" {
   description = "AWS EC2 Key name for SSH access"
   type        = string
-  default = "tf-demo-key"
+  default     = "tf-demo-key"
 }
 
 variable "prefix" {
@@ -23,4 +23,5 @@ variable availabilityZones {
   type        = list
   default     = ["us-east-1a", "us-east-1b"]
 }
+
 variable AllowedIPs {}

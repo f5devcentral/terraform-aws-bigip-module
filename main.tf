@@ -1,5 +1,5 @@
 locals {
- bigip_map = {
+  bigip_map = {
     "mgmt_subnet_id"            = var.mgmt_subnet_id
     "mgmt_securitygroup_id"     = var.mgmt_securitygroup_id
     "external_subnet_id"        = var.external_subnet_id
@@ -152,9 +152,9 @@ resource "aws_network_interface" "private" {
 #
 resource "aws_instance" "f5_bigip" {
   # determine the number of BIG-IPs to deploy
-  count                = var.f5_instance_count
-  instance_type        = var.ec2_instance_type
-  ami                  = data.aws_ami.f5_ami.id
+  count         = var.f5_instance_count
+  instance_type = var.ec2_instance_type
+  ami           = data.aws_ami.f5_ami.id
 
   root_block_device {
     delete_on_termination = true
