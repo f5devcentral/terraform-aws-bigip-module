@@ -73,6 +73,12 @@ resource "aws_subnet" "mgmt" {
     Name = "management"
   }
 }
+
+resource "aws_route_table_association" "route_table_management" {
+  subnet_id      = aws_subnet.mgmt.id
+  route_table_id = aws_route_table.internet-gw.id
+}
+
 resource "aws_subnet" "external-public" {
   vpc_id            = module.vpc.vpc_id
   cidr_block        = "10.0.2.0/24"
@@ -82,6 +88,7 @@ resource "aws_subnet" "external-public" {
     Name = "external"
   }
 }
+
 resource "aws_route_table_association" "route_table_external" {
   subnet_id      = aws_subnet.external-public.id
   route_table_id = aws_route_table.internet-gw.id
@@ -120,6 +127,7 @@ module "mgmt-network-security-group" {
 
 resource "tls_private_key" "example" {
   algorithm = "RSA"
+  rsa_bits  = 4096
   //ecdsa_curve = "P384"
 }
 
@@ -127,7 +135,8 @@ resource "tls_private_key" "example" {
 
 resource "aws_key_pair" "generated_key" {
   key_name   = format("%s-%s-%s", var.prefix, var.ec2_key_name, random_id.id.hex)
-  public_key = "${tls_private_key.example.public_key_openssh}"
+  public_key = tls_private_key.example.public_key_openssh
+  //public_key = file("/Users/chinthalapalli/.ssh/id_rsa.pub")
 }
 #
 # Create BIG-IP

@@ -107,7 +107,6 @@ data "aws_ami" "f5_ami" {
 }
 
 
-
 #
 # Create Management Network Interfaces
 #
@@ -155,6 +154,7 @@ resource "aws_instance" "f5_bigip" {
   count         = var.f5_instance_count
   instance_type = var.ec2_instance_type
   ami           = data.aws_ami.f5_ami.id
+  key_name      = var.ec2_key_name
 
   root_block_device {
     delete_on_termination = true
@@ -190,6 +190,20 @@ resource "aws_instance" "f5_bigip" {
       device_index         = 2
     }
   }
+
+  # build user_data file from template
+  user_data = var.custom_user_data != null ? var.custom_user_data : templatefile(
+    "${path.module}/f5_onboard.tmpl",
+    {
+      DO_URL      = var.DO_URL,
+      AS3_URL     = var.AS3_URL,
+      TS_URL      = var.TS_URL,
+      CFE_URL     = var.CFE_URL,
+      libs_dir    = var.libs_dir,
+      onboard_log = var.onboard_log,
+      secret_id   = data.aws_secretsmanager_secret.password.id
+    }
+  )
   depends_on = [aws_eip.mgmt]
 
   tags = {
