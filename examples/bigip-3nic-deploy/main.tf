@@ -65,7 +65,7 @@ resource "aws_route_table" "internet-gw" {
 
 resource "aws_subnet" "mgmt" {
   vpc_id            = module.vpc.vpc_id
-  cidr_block        = "10.0.1.0/24"
+  cidr_block        = cidrsubnet(var.cidr, 8, 1)
   availability_zone = "us-east-1a"
 
   tags = {
@@ -74,7 +74,7 @@ resource "aws_subnet" "mgmt" {
 }
 resource "aws_subnet" "external-public" {
   vpc_id            = module.vpc.vpc_id
-  cidr_block        = "10.0.2.0/24"
+  cidr_block        = cidrsubnet(var.cidr, 8, 2)
   availability_zone = "us-east-1a"
 
   tags = {
@@ -83,23 +83,23 @@ resource "aws_subnet" "external-public" {
 }
 resource "aws_subnet" "internal" {
   vpc_id            = module.vpc.vpc_id
-  cidr_block        = "10.0.3.0/24"
+  cidr_block        = cidrsubnet(var.cidr, 8, 3)
   availability_zone = "us-east-1a"
 
   tags = {
     Name = "internal"
   }
 }
-resource "aws_route_table_association" "route_table_internal" {
-  subnet_id      = aws_subnet.internal.id
+
+resource "aws_route_table_association" "route_table_mgmt" {
+  subnet_id      = aws_subnet.mgmt.id
   route_table_id = aws_route_table.internet-gw.id
 }
+
 resource "aws_route_table_association" "route_table_external" {
   subnet_id      = aws_subnet.external-public.id
   route_table_id = aws_route_table.internet-gw.id
 }
-
-
 
 #
 # Create a security group for BIG-IP
@@ -147,13 +147,12 @@ module "internal-network-security-group-public" {
 }
 resource "tls_private_key" "example" {
   algorithm = "RSA"
+  rsa_bits  = 4096
 }
-
-
 
 resource "aws_key_pair" "generated_key" {
   key_name   = format("%s-%s-%s", var.prefix, var.ec2_key_name, random_id.id.hex)
-  public_key = "${tls_private_key.example.public_key_openssh}"
+  public_key = tls_private_key.example.public_key_openssh
 }
 
 #

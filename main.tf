@@ -86,6 +86,7 @@ locals {
     for i in local.internal_private_index : local.bigip_map["internal_securitygroup_id"][i]
   ]
 }
+
 #
 # Ensure Secret exists
 #
@@ -106,7 +107,6 @@ data "aws_ami" "f5_ami" {
   }
 }
 
-
 #
 # Create Management Network Interfaces
 #
@@ -115,7 +115,6 @@ resource "aws_network_interface" "mgmt" {
   subnet_id       = local.bigip_map["mgmt_subnet_id"][count.index]["subnet_id"]
   security_groups = var.mgmt_securitygroup_id
 }
-
 
 #
 # add an elastic IP to the BIG-IP management interface
@@ -144,7 +143,6 @@ resource "aws_network_interface" "private" {
   subnet_id       = local.internal_private_subnet_id[count.index]
   security_groups = var.internal_securitygroup_id
 }
-
 
 
 # Deploy BIG-IP
@@ -180,7 +178,6 @@ resource "aws_instance" "f5_bigip" {
     }
   }
 
-
   # set the private interface only if an interface is defined
   dynamic "network_interface" {
     for_each = length(aws_network_interface.private) > count.index ? toset([aws_network_interface.private[count.index].id]) : toset([])
@@ -210,5 +207,3 @@ resource "aws_instance" "f5_bigip" {
     Name = format("%s-%d", var.prefix, count.index)
   }
 }
-
-

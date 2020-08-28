@@ -24,6 +24,7 @@ resource "random_password" "password" {
 resource "aws_secretsmanager_secret" "bigip" {
   name = format("%s-bigip-secret-%s", var.prefix, random_id.id.hex)
 }
+
 resource "aws_secretsmanager_secret_version" "bigip-pwd" {
   secret_id     = aws_secretsmanager_secret.bigip.id
   secret_string = random_password.password.result
@@ -65,7 +66,7 @@ resource "aws_route_table" "internet-gw" {
 
 resource "aws_subnet" "mgmt" {
   vpc_id            = module.vpc.vpc_id
-  cidr_block        = "10.0.1.0/24"
+  cidr_block        = cidrsubnet(var.cidr, 8, 1)
   availability_zone = "ap-south-1a"
 
   tags = {
@@ -73,7 +74,7 @@ resource "aws_subnet" "mgmt" {
   }
 }
 
-resource "aws_route_table_association" "route_table_external" {
+resource "aws_route_table_association" "route_table_mgmt" {
   subnet_id      = aws_subnet.mgmt.id
   route_table_id = aws_route_table.internet-gw.id
 }
@@ -98,7 +99,7 @@ resource "tls_private_key" "example" {
 
 resource "aws_key_pair" "generated_key" {
   key_name   = format("%s-%s-%s", var.prefix, var.ec2_key_name, random_id.id.hex)
-  public_key = "${tls_private_key.example.public_key_openssh}"
+  public_key = tls_private_key.example.public_key_openssh
 }
 
 #
