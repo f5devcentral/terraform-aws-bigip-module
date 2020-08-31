@@ -119,6 +119,15 @@ variable CFE_URL {
   default     = "https://github.com/f5devcentral/f5-cloud-failover-extension/releases/download/v1.1.0/f5-cloud-failover-1.1.0-0.noarch.rpm"
 }
 
+## Please check and update the latest FAST URL from https://github.com/F5Networks/f5-appsvcs-templates/releases/latest 
+# always point to a specific version in order to avoid inadvertent configuration inconsistency
+variable fastPackageUrl {
+  description = "URL to download the BIG-IP FAST module"
+  type        = string
+  //default     = ""
+  default = "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.1.0/f5-appsvcs-templates-1.1.0-1.noarch.rpm"
+}
+
 variable "libs_dir" {
   description = "Directory on the BIG-IP to download the A&O Toolchain into"
   type        = string

@@ -12,10 +12,12 @@ resource "random_id" "id" {
 #
 # Create random password for BIG-IP
 #
-resource "random_password" "password" {
-  length           = 16
-  special          = true
-  override_special = " #%*+,-./:=?@[]^_~"
+resource random_string password {
+  length      = 16
+  min_upper   = 1
+  min_lower   = 1
+  min_numeric = 1
+  special     = false
 }
 
 #
@@ -26,7 +28,7 @@ resource "aws_secretsmanager_secret" "bigip" {
 }
 resource "aws_secretsmanager_secret_version" "bigip-pwd" {
   secret_id     = aws_secretsmanager_secret.bigip.id
-  secret_string = random_password.password.result
+  secret_string = random_string.password.result
 }
 #
 # Create the VPC
@@ -114,6 +116,10 @@ module "external-network-security-group-public" {
   ingress_cidr_blocks = var.AllowedIPs
   ingress_rules       = ["http-80-tcp", "https-443-tcp"]
 
+  # Allow ec2 instances outbound Internet connectivity
+  egress_cidr_blocks = ["0.0.0.0/0"]
+  egress_rules       = ["all-all"]
+
 }
 
 #
@@ -129,6 +135,10 @@ module "mgmt-network-security-group" {
   ingress_cidr_blocks = var.AllowedIPs
   ingress_rules       = ["https-443-tcp", "https-8443-tcp", "ssh-tcp"]
 
+  # Allow ec2 instances outbound Internet connectivity
+  egress_cidr_blocks = ["0.0.0.0/0"]
+  egress_rules       = ["all-all"]
+
 }
 
 #
@@ -143,6 +153,10 @@ module "internal-network-security-group-public" {
 
   ingress_cidr_blocks = var.AllowedIPs
   ingress_rules       = ["http-80-tcp", "https-443-tcp"]
+
+  # Allow ec2 instances outbound Internet connectivity
+  egress_cidr_blocks = ["0.0.0.0/0"]
+  egress_rules       = ["all-all"]
 
 }
 resource "tls_private_key" "example" {

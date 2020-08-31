@@ -21,6 +21,6 @@ variable cidr {
 variable availabilityZones {
   description = "If you want the VM placed in an AWS Availability Zone, and the AWS region you are deploying to supports it, specify the numbers of the existing Availability Zone you want to use."
   type        = list
-  default     = ["ap-south-1a", "ap-south-1b"]
+  default     = ["us-east-1a", "us-east-1b"]
 }
 variable AllowedIPs {}

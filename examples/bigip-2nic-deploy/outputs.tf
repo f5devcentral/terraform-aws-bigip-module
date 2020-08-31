@@ -15,11 +15,16 @@ output "bigip_mgmt_port" {
 }
 # BIG-IP Password
 output "password" {
-  value     = random_password.password
-  sensitive = true
+  value = random_string.password.result
+  //sensitive = true
 }
 
 # BIG-IP Password Secret name
 output "aws_secretmanager_secret_name" {
   value = aws_secretsmanager_secret.bigip.name
+}
+
+# BIG-IP Password Secret name
+output "tls_rsa_private_key" {
+  value = tls_private_key.example.private_key_pem
 }

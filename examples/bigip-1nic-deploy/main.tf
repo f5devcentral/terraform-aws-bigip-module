@@ -12,10 +12,12 @@ resource "random_id" "id" {
 #
 # Create random password for BIG-IP
 #
-resource "random_password" "password" {
-  length           = 16
-  special          = true
-  override_special = " #%*+,-./:=?@[]^_~"
+resource random_string password {
+  length      = 16
+  min_upper   = 1
+  min_lower   = 1
+  min_numeric = 1
+  special     = false
 }
 
 #
@@ -27,7 +29,7 @@ resource "aws_secretsmanager_secret" "bigip" {
 
 resource "aws_secretsmanager_secret_version" "bigip-pwd" {
   secret_id     = aws_secretsmanager_secret.bigip.id
-  secret_string = random_password.password.result
+  secret_string = random_string.password.result
 }
 
 #
@@ -67,7 +69,7 @@ resource "aws_route_table" "internet-gw" {
 resource "aws_subnet" "mgmt" {
   vpc_id            = module.vpc.vpc_id
   cidr_block        = cidrsubnet(var.cidr, 8, 1)
-  availability_zone = "ap-south-1a"
+  availability_zone = "us-east-1a"
 
   tags = {
     Name = "management"
@@ -91,10 +93,15 @@ module "mgmt-network-security-group" {
   ingress_cidr_blocks = var.AllowedIPs
   ingress_rules       = ["https-443-tcp", "https-8443-tcp", "ssh-tcp"]
 
+  # Allow ec2 instances outbound Internet connectivity
+  egress_cidr_blocks = ["0.0.0.0/0"]
+  egress_rules       = ["all-all"]
+
 }
 
 resource "tls_private_key" "example" {
   algorithm = "RSA"
+  rsa_bits  = 4096
 }
 
 resource "aws_key_pair" "generated_key" {

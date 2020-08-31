@@ -94,6 +94,9 @@ data "aws_secretsmanager_secret" "password" {
   name = var.aws_secretmanager_secret_id
 }
 
+data "aws_secretsmanager_secret_version" "current" {
+  secret_id = data.aws_secretsmanager_secret.password.id
+}
 #
 # Find BIG-IP AMI
 #
@@ -151,8 +154,9 @@ resource "aws_instance" "f5_bigip" {
   # determine the number of BIG-IPs to deploy
   count         = var.f5_instance_count
   instance_type = var.ec2_instance_type
-  ami           = data.aws_ami.f5_ami.id
-  key_name      = var.ec2_key_name
+  //ami           = data.aws_ami.f5_ami.id
+  ami      = "ami-06dc68a7e98339119"
+  key_name = var.ec2_key_name
 
   root_block_device {
     delete_on_termination = true
@@ -192,16 +196,18 @@ resource "aws_instance" "f5_bigip" {
   user_data = var.custom_user_data != null ? var.custom_user_data : templatefile(
     "${path.module}/f5_onboard.tmpl",
     {
-      DO_URL      = var.DO_URL,
-      AS3_URL     = var.AS3_URL,
-      TS_URL      = var.TS_URL,
-      CFE_URL     = var.CFE_URL,
-      libs_dir    = var.libs_dir,
-      onboard_log = var.onboard_log,
-      secret_id   = data.aws_secretsmanager_secret.password.id
+      DO_URL         = var.DO_URL,
+      AS3_URL        = var.AS3_URL,
+      TS_URL         = var.TS_URL,
+      CFE_URL        = var.CFE_URL,
+      FAST_URL       = var.fastPackageUrl
+      libs_dir       = var.libs_dir,
+      onboard_log    = var.onboard_log,
+      bigip_username = "admin"
+      bigip_password = data.aws_secretsmanager_secret_version.current.secret_string
     }
   )
-  depends_on = [aws_eip.mgmt]
+  depends_on = [aws_eip.mgmt, aws_network_interface.public, aws_network_interface.private]
 
   tags = {
     Name = format("%s-%d", var.prefix, count.index)
