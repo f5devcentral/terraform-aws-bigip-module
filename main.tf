@@ -88,14 +88,28 @@ locals {
 }
 
 #
+# Create random password for BIG-IP
+#
+resource random_string dynamic_password {
+  length      = 16
+  min_upper   = 1
+  min_lower   = 1
+  min_numeric = 1
+  special     = false
+}
+
+#
 # Ensure Secret exists
 #
 data "aws_secretsmanager_secret" "password" {
-  name = var.aws_secretmanager_secret_id
+  count = var.aws_secretmanager_auth ? 1 : 0
+  name  = var.aws_secretmanager_secret_id
 }
 
 data "aws_secretsmanager_secret_version" "current" {
-  secret_id = data.aws_secretsmanager_secret.password.id
+  count     = var.aws_secretmanager_auth ? 1 : 0
+  secret_id = data.aws_secretsmanager_secret.password[count.index].id
+  //depends_on =[data.aws_secretsmanager_secret.password]
 }
 #
 # Find BIG-IP AMI
@@ -203,8 +217,8 @@ resource "aws_instance" "f5_bigip" {
       FAST_URL       = var.fastPackageUrl
       libs_dir       = var.libs_dir,
       onboard_log    = var.onboard_log,
-      bigip_username = "admin"
-      bigip_password = data.aws_secretsmanager_secret_version.current.secret_string
+      bigip_username = var.f5_username
+      bigip_password = var.aws_secretmanager_auth ? data.aws_secretsmanager_secret_version.current[0].secret_string : random_string.dynamic_password.result
     }
   )
   depends_on = [aws_eip.mgmt, aws_network_interface.public, aws_network_interface.private]

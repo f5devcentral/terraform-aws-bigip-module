@@ -1,47 +1,59 @@
-variable "prefix" {
+variable prefix {
   description = "Prefix for resources created by this module"
   type        = string
   default     = "tf-aws-bigip"
 }
 
-variable "f5_ami_search_name" {
+variable f5_username {
+  description = "The admin username of the F5 Bigip that will be deployed"
+  default     = "bigipuser"
+}
+
+variable f5_ami_search_name {
   description = "BIG-IP AMI name to search for"
   type        = string
   default     = "F5 Networks BIGIP-14.* PAYG - Best 200Mbps*"
 }
 
-variable "f5_instance_count" {
+variable f5_instance_count {
   description = "Number of BIG-IPs to deploy"
   type        = number
   default     = 1
 }
-
-variable "application_endpoint_count" {
+variable application_endpoint_count {
   description = "number of public application addresses to assign"
   type        = number
   default     = 1
 }
 
-variable "ec2_instance_type" {
+variable ec2_instance_type {
   description = "AWS EC2 instance type"
   type        = string
   default     = "m5.large"
 }
 
-variable "ec2_key_name" {
+variable ec2_key_name {
   description = "AWS EC2 Key name for SSH access"
   type        = string
   default     = "tf-demo-key"
 }
 
-variable "mgmt_eip" {
+variable mgmt_eip {
   description = "Enable an Elastic IP address on the management interface"
   type        = bool
   default     = true
 }
-variable "aws_secretmanager_secret_id" {
+
+variable aws_secretmanager_auth {
+  description = "Whether to use key vault to pass authentication"
+  type        = bool
+  default     = false
+}
+
+variable aws_secretmanager_secret_id {
   description = "AWS Secret Manager Secret ID that stores the BIG-IP password"
   type        = string
+  default     = null
 }
 
 variable mgmt_subnet_id {
@@ -128,7 +140,7 @@ variable fastPackageUrl {
   default = "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.1.0/f5-appsvcs-templates-1.1.0-1.noarch.rpm"
 }
 
-variable "libs_dir" {
+variable libs_dir {
   description = "Directory on the BIG-IP to download the A&O Toolchain into"
   type        = string
   default     = "/config/cloud/aws/node_modules"

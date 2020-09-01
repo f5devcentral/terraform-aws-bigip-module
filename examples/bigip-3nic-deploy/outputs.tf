@@ -13,18 +13,21 @@ output "bigip_mgmt_dns" {
 output "bigip_mgmt_port" {
   value = module.bigip.mgmt_port
 }
-# BIG-IP Password
-output "password" {
-  value     = random_string.password.result
-  sensitive = true
-}
 
 # BIG-IP Password Secret name
 output "aws_secretmanager_secret_name" {
   value = aws_secretsmanager_secret.bigip.name
 }
 
-# BIG-IP Password Secret name
-output "tls_rsa_private_key" {
-  value = tls_private_key.example.private_key_pem
+// # BIG-IP Password Secret name
+// output "tls_rsa_private_key" {
+//   value = tls_private_key.example.private_key_pem
+// }
+
+output bigip_username {
+  value = module.bigip.f5_username
+}
+
+output bigip_password {
+  value = module.bigip.bigip_password
 }
