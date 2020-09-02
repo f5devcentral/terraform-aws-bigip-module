@@ -85,6 +85,12 @@ locals {
   internal_private_security_id = [
     for i in local.internal_private_index : local.bigip_map["internal_securitygroup_id"][i]
   ]
+  total_nics       = length(concat(local.mgmt_public_subnet_id, local.mgmt_private_subnet_id, local.external_public_subnet_id, local.external_private_subnet_id, local.internal_public_subnet_id, local.internal_private_subnet_id))
+  vlan_list        = concat(local.external_public_subnet_id, local.external_private_subnet_id, local.internal_public_subnet_id, local.internal_private_subnet_id)
+  selfip_list_temp = concat(aws_network_interface.public.*.private_ips, aws_network_interface.private.*.private_ips)
+  selfip_list      = flatten(local.selfip_list_temp)
+  //azurerm_network_interface.external_public_nic.*.private_ip_address, azurerm_network_interface.internal_nic.*.private_ip_address)
+
 }
 
 #
@@ -143,13 +149,23 @@ resource "aws_eip" "mgmt" {
 }
 
 #
-# Create Public Network Interfaces
+# Create Public External Network Interfaces
 #
 resource "aws_network_interface" "public" {
-  count             = length(local.external_public_subnet_id)
-  subnet_id         = local.external_public_subnet_id[count.index]
-  security_groups   = var.external_securitygroup_id
-  private_ips_count = var.application_endpoint_count
+  count           = length(local.external_public_subnet_id)
+  subnet_id       = local.external_public_subnet_id[count.index]
+  security_groups = var.external_securitygroup_id
+  //private_ips_count = var.application_endpoint_count
+}
+
+#
+# Create Private External Network Interfaces
+#
+resource "aws_network_interface" "external_private" {
+  count           = length(local.external_private_subnet_id)
+  subnet_id       = local.external_private_subnet_id[count.index]
+  security_groups = var.external_securitygroup_id
+  //private_ips_count = var.application_endpoint_count
 }
 
 #
@@ -226,4 +242,45 @@ resource "aws_instance" "f5_bigip" {
   tags = {
     Name = format("%s-%d", var.prefix, count.index)
   }
+}
+
+data template_file clustermemberDO1 {
+  count    = local.total_nics == 1 ? 1 : 0
+  template = "${file("${path.module}/onboard_do_1nic.tpl")}"
+  vars = {
+    hostname      = aws_eip.mgmt[0].public_dns
+    name_servers  = join(",", formatlist("\"%s\"", ["168.63.129.16"]))
+    search_domain = "f5.com"
+    ntp_servers   = join(",", formatlist("\"%s\"", ["0.pool.ntp.org", "1.pool.ntp.org", "2.pool.ntp.org"]))
+  }
+}
+
+data template_file clustermemberDO2 {
+  count    = local.total_nics == 2 ? 1 : 0
+  template = file("${path.module}/onboard_do_2nic.tpl")
+  vars = {
+    hostname      = aws_eip.mgmt[0].public_dns
+    name_servers  = join(",", formatlist("\"%s\"", ["168.63.129.16"]))
+    search_domain = "f5.com"
+    ntp_servers   = join(",", formatlist("\"%s\"", ["0.pool.ntp.org", "1.pool.ntp.org", "2.pool.ntp.org"]))
+    vlan-name     = element(split("/", local.vlan_list[0]), length(split("/", local.vlan_list[0])) - 1)
+    self-ip       = local.selfip_list[0]
+  }
+  depends_on = [aws_network_interface.public, aws_network_interface.private]
+}
+
+data template_file clustermemberDO3 {
+  count    = local.total_nics == 3 ? 1 : 0
+  template = file("${path.module}/onboard_do_3nic.tpl")
+  vars = {
+    hostname      = aws_eip.mgmt[0].public_dns
+    name_servers  = join(",", formatlist("\"%s\"", ["168.63.129.16"]))
+    search_domain = "f5.com"
+    ntp_servers   = join(",", formatlist("\"%s\"", ["0.pool.ntp.org", "1.pool.ntp.org", "2.pool.ntp.org"]))
+    vlan-name1    = element(split("/", local.vlan_list[0]), length(split("/", local.vlan_list[0])) - 1)
+    self-ip1      = local.selfip_list[0]
+    vlan-name2    = element(split("/", local.vlan_list[1]), length(split("/", local.vlan_list[1])) - 1)
+    self-ip2      = local.selfip_list[1]
+  }
+  depends_on = [aws_network_interface.public, aws_network_interface.private]
 }
