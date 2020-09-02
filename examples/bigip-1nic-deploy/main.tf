@@ -115,17 +115,31 @@ resource "aws_key_pair" "generated_key" {
 module bigip {
   source = "../../"
 
-  prefix = format(
-    "%s-bigip-3-nic_with_new_vpc-%s",
+   prefix = format(
+    "%s-bigip-1-nic_with_new_vpc-%s",
     var.prefix,
     random_id.id.hex
   )
-  f5_instance_count           = 1
+#  f5_instance_count           = 1
   ec2_key_name                = aws_key_pair.generated_key.key_name
-  aws_secretmanager_secret_id = aws_secretsmanager_secret.bigip.id
+#  aws_secretmanager_secret_id = aws_secretsmanager_secret.bigip.id
+  
   mgmt_securitygroup_id       = [module.mgmt-network-security-group.this_security_group_id]
   mgmt_subnet_id              = [{ "subnet_id" = aws_subnet.mgmt.id, "public_ip" = true }]
 }
+
+resource "null_resource" "clusterDO" {
+
+  provisioner "local-exec" {
+    command = "cat > DO_1nic.json <<EOL\n ${module.bigip.onboard_do}\nEOL"
+  }
+  provisioner "local-exec" {
+    when    = destroy
+    command = "rm -rf DO_1nic.json"
+  }
+  depends_on = [ module.bigip.onboard_do]
+}
+
 
 #
 # Variables used by this example

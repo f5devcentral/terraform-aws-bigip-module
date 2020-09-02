@@ -20,6 +20,7 @@ variable f5_instance_count {
   type        = number
   default     = 1
 }
+
 variable application_endpoint_count {
   description = "number of public application addresses to assign"
   type        = number
