@@ -32,9 +32,10 @@ output bigip_password {
   value = module.bigip.bigip_password
 }
 
-output bigip_onboard_do {
-  value = module.bigip.onboard_do
-}
+
+//output bigip_onboard_do {
+//  value = module.bigip.onboard_do
+//}
 
 output selfip_list {
   value = module.bigip.selfip_list

@@ -24,7 +24,7 @@ output "aws_secretmanager_secret_name" {
   value = aws_secretsmanager_secret.bigip.name
 }
 
-# BIG-IP Password Secret name
-output "tls_rsa_private_key" {
-  value = tls_private_key.example.private_key_pem
-}
+// # BIG-IP Password Secret name
+// output "tls_rsa_private_key" {
+//   value = tls_private_key.example.private_key_pem
+// }

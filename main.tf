@@ -90,7 +90,15 @@ locals {
   selfip_list_temp = concat(aws_network_interface.public.*.private_ips, aws_network_interface.private.*.private_ips)
   selfip_list      = flatten(local.selfip_list_temp)
   //azurerm_network_interface.external_public_nic.*.private_ip_address, azurerm_network_interface.internal_nic.*.private_ip_address)
+  instance_prefix = format("%s-%s", var.prefix, random_id.module_id.hex)
 
+}
+
+#
+# Create a random id
+#
+resource "random_id" "module_id" {
+  byte_length = 2
 }
 
 #
@@ -185,7 +193,7 @@ resource "aws_instance" "f5_bigip" {
   count         = var.f5_instance_count
   instance_type = var.ec2_instance_type
   ami           = data.aws_ami.f5_ami.id
-  key_name = var.ec2_key_name
+  key_name      = var.ec2_key_name
 
   root_block_device {
     delete_on_termination = true
@@ -239,7 +247,7 @@ resource "aws_instance" "f5_bigip" {
   depends_on = [aws_eip.mgmt, aws_network_interface.public, aws_network_interface.private]
 
   tags = {
-    Name = format("%s-%d", var.prefix, count.index)
+    Name = format("%s-%d", local.instance_prefix, count.index)
   }
 }
 

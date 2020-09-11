@@ -152,22 +152,14 @@ resource "aws_key_pair" "generated_key" {
 # Create BIG-IP
 #
 module bigip {
-  source = "../../"
-
-  prefix = format(
-    "%s-bigip-3-nic_with_new_vpc-%s",
-    var.prefix,
-    random_id.id.hex
-  )
-  f5_instance_count           = 1
+  source                      = "../../"
+  prefix                      = format("%s-2nic", var.prefix)
   ec2_key_name                = aws_key_pair.generated_key.key_name
   aws_secretmanager_secret_id = aws_secretsmanager_secret.bigip.id
+  mgmt_subnet_id              = [{ "subnet_id" = aws_subnet.mgmt.id, "public_ip" = true }]
   mgmt_securitygroup_id       = [module.mgmt-network-security-group.this_security_group_id]
-
-  external_securitygroup_id = [module.external-network-security-group-public.this_security_group_id]
-
-  external_subnet_id = [{ "subnet_id" = aws_subnet.external-public.id, "public_ip" = true }]
-  mgmt_subnet_id     = [{ "subnet_id" = aws_subnet.mgmt.id, "public_ip" = true }]
+  external_securitygroup_id   = [module.external-network-security-group-public.this_security_group_id]
+  external_subnet_id          = [{ "subnet_id" = aws_subnet.external-public.id, "public_ip" = true }]
 }
 
 #

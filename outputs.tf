@@ -13,7 +13,7 @@ output mgmt_public_dns {
 # BIG-IP Management Port
 output mgmt_port {
   description = "HTTPS Port used for the BIG-IP management interface"
-  value       =  local.total_nics > 1 ? "443" : "8443"
+  value       = local.total_nics > 1 ? "443" : "8443"
 }
 
 # Public Network Interface

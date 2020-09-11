@@ -113,19 +113,12 @@ resource "aws_key_pair" "generated_key" {
 # Create BIG-IP
 #
 module bigip {
-  source = "../../"
-
-   prefix = format(
-    "%s-bigip-1-nic_with_new_vpc-%s",
-    var.prefix,
-    random_id.id.hex
-  )
-#  f5_instance_count           = 1
-  ec2_key_name                = aws_key_pair.generated_key.key_name
-#  aws_secretmanager_secret_id = aws_secretsmanager_secret.bigip.id
-  
-  mgmt_securitygroup_id       = [module.mgmt-network-security-group.this_security_group_id]
-  mgmt_subnet_id              = [{ "subnet_id" = aws_subnet.mgmt.id, "public_ip" = true }]
+  source       = "../../"
+  prefix       = format("%s-1nic", var.prefix)
+  ec2_key_name = aws_key_pair.generated_key.key_name
+  #  aws_secretmanager_secret_id = aws_secretsmanager_secret.bigip.id
+  mgmt_subnet_id        = [{ "subnet_id" = aws_subnet.mgmt.id, "public_ip" = true }]
+  mgmt_securitygroup_id = [module.mgmt-network-security-group.this_security_group_id]
 }
 
 resource "null_resource" "clusterDO" {
@@ -137,7 +130,7 @@ resource "null_resource" "clusterDO" {
     when    = destroy
     command = "rm -rf DO_1nic.json"
   }
-  depends_on = [ module.bigip.onboard_do]
+  depends_on = [module.bigip.onboard_do]
 }
 
 
