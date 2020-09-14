@@ -87,7 +87,8 @@ locals {
   ]
   total_nics       = length(concat(local.mgmt_public_subnet_id, local.mgmt_private_subnet_id, local.external_public_subnet_id, local.external_private_subnet_id, local.internal_public_subnet_id, local.internal_private_subnet_id))
   vlan_list        = concat(local.external_public_subnet_id, local.external_private_subnet_id, local.internal_public_subnet_id, local.internal_private_subnet_id)
-  selfip_list_temp = concat(aws_network_interface.public.*.private_ips, aws_network_interface.private.*.private_ips)
+  selfip_list_temp = concat(aws_network_interface.public.*.private_ips, aws_network_interface.external_private.*.private_ips, aws_network_interface.private.*.private_ips)
+  ext_interfaces   = concat(aws_network_interface.public.*.id, aws_network_interface.external_private.*.id)
   selfip_list      = flatten(local.selfip_list_temp)
   //azurerm_network_interface.external_public_nic.*.private_ip_address, azurerm_network_interface.internal_nic.*.private_ip_address)
   instance_prefix = format("%s-%s", var.prefix, random_id.module_id.hex)
@@ -145,6 +146,11 @@ resource "aws_network_interface" "mgmt" {
   count           = length(local.bigip_map["mgmt_subnet_ids"])
   subnet_id       = local.bigip_map["mgmt_subnet_ids"][count.index]["subnet_id"]
   security_groups = var.mgmt_securitygroup_ids
+  tags = {
+    Name   = format("%s-%d", "BIGIP-Managemt-Interface", count.index)
+    Prefix = format("%s", local.instance_prefix)
+  }
+
 }
 
 #
@@ -163,6 +169,7 @@ resource "aws_eip" "ext-pub" {
   count             = length(local.external_public_subnet_id)
   network_interface = aws_network_interface.public[count.index].id
   vpc               = true
+  depends_on        = [aws_eip.mgmt]
 }
 
 #
@@ -173,6 +180,10 @@ resource "aws_network_interface" "public" {
   subnet_id       = local.external_public_subnet_id[count.index]
   security_groups = var.external_securitygroup_ids
   //private_ips_count = var.application_endpoint_count
+  tags = {
+    Name   = format("%s-%d", "BIGIP-External-Public-Interface", count.index)
+    Prefix = format("%s", local.instance_prefix)
+  }
 }
 
 #
@@ -183,6 +194,10 @@ resource "aws_network_interface" "external_private" {
   subnet_id       = local.external_private_subnet_id[count.index]
   security_groups = var.external_securitygroup_ids
   //private_ips_count = var.application_endpoint_count
+  tags = {
+    Name   = format("%s-%d", "BIGIP-External-Private-Interface", count.index)
+    Prefix = format("%s", local.instance_prefix)
+  }
 }
 
 #
@@ -192,6 +207,10 @@ resource "aws_network_interface" "private" {
   count           = length(local.internal_private_subnet_id)
   subnet_id       = local.internal_private_subnet_id[count.index]
   security_groups = var.internal_securitygroup_ids
+  tags = {
+    Name   = format("%s-%d", "BIGIP-Internal-Interface", count.index)
+    Prefix = format("%s", local.instance_prefix)
+  }
 }
 
 # Deploy BIG-IP
@@ -219,7 +238,8 @@ resource "aws_instance" "f5_bigip" {
 
   # set the public interface only if an interface is defined
   dynamic "network_interface" {
-    for_each = length(aws_network_interface.public) > count.index ? toset([aws_network_interface.public[count.index].id]) : toset([])
+    for_each = length(local.ext_interfaces) > count.index ? toset(local.ext_interfaces) : toset([])
+    //for_each = length(aws_network_interface.public) > count.index ? toset([aws_network_interface.public[count.index].id]) : toset([])
 
     content {
       network_interface_id = network_interface.value

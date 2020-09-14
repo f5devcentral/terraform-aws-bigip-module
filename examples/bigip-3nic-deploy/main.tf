@@ -69,7 +69,7 @@ resource "aws_route_table" "internet-gw" {
 resource "aws_subnet" "mgmt" {
   vpc_id            = module.vpc.vpc_id
   cidr_block        = cidrsubnet(var.cidr, 8, 1)
-  availability_zone = "us-east-1a"
+  availability_zone = format("%sa", var.region)
 
   tags = {
     Name = "management"
@@ -78,7 +78,7 @@ resource "aws_subnet" "mgmt" {
 resource "aws_subnet" "external-public" {
   vpc_id            = module.vpc.vpc_id
   cidr_block        = cidrsubnet(var.cidr, 8, 2)
-  availability_zone = "us-east-1a"
+  availability_zone = format("%sa", var.region)
 
   tags = {
     Name = "external"
@@ -87,7 +87,7 @@ resource "aws_subnet" "external-public" {
 resource "aws_subnet" "internal" {
   vpc_id            = module.vpc.vpc_id
   cidr_block        = cidrsubnet(var.cidr, 8, 3)
-  availability_zone = "us-east-1a"
+  availability_zone = format("%sa", var.region)
 
   tags = {
     Name = "internal"
@@ -182,7 +182,7 @@ module bigip {
   mgmt_securitygroup_ids      = [module.mgmt-network-security-group.this_security_group_id]
   external_securitygroup_ids  = [module.external-network-security-group-public.this_security_group_id]
   internal_securitygroup_ids  = [module.internal-network-security-group-public.this_security_group_id]
-  external_subnet_ids         = [{ "subnet_id" = aws_subnet.external-public.id, "public_ip" = true }]
+  external_subnet_ids         = [{ "subnet_id" = aws_subnet.external-public.id, "public_ip" = false }]
   internal_subnet_ids         = [{ "subnet_id" = aws_subnet.internal.id, "public_ip" = false }]
   //depends_on                  = [aws_secretsmanager_secret.bigip]
 }
