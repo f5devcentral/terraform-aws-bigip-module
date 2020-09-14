@@ -1,6 +1,6 @@
-## Deploys BIG-IP in Azure Cloud
+## Deploys BIG-IP in AWS Cloud
 
-This Terraform module deploys N-nic F5 BIG-IP in Azure cloud
+This Terraform module deploys N-nic F5 BIG-IP in AWS cloud
 
 
 ## Example Usage
@@ -11,47 +11,43 @@ below example snippet show how this module called.
 
 ```
 
-Example 1-NIC Deployment Module usage
-
+#
+#Example 1-NIC Deployment Module usage
+#
 module bigip {
- source                      = "../"
-  dnsLabel                    = "bigip-azure-1nic"
-  resource_group_name         = "testbigip"
-  mgmt_subnet_id              = [{"subnet_id" = "subnet_id_mgmt" , "public_ip" = true}]
-  mgmt_securitygroup_id       = ["securitygroup_id_mgmt"]
-  availabilityZones           =  var.availabilityZones
-
-
+  source                 = "../../"
+  prefix                 = "bigip-aws-1nic"
+  ec2_key_name           = aws_key_pair.generated_key.key_name
+  mgmt_subnet_ids        = [{ "subnet_id" = "subnet_id_mgmt", "public_ip" = true }]
+  mgmt_securitygroup_ids = ["securitygroup_id_mgmt"]
 }
 
-
-Example 2-NIC Deployment Module usage
-
+#
+#Example 2-NIC Deployment Module usage
+#
 module bigip {
-  source                      = "../"
-  dnsLabel                    = "bigip-azure-2nic"
-  resource_group_name         = "testbigip"
-  mgmt_subnet_id              = [{"subnet_id" = "subnet_id_mgmt" , "public_ip" = true}]
-  mgmt_securitygroup_id       = ["securitygroup_id_mgmt"]
-  external_subnet_id          = [{"subnet_id" =  "subnet_id_external", "public_ip" = true }]
-  external_securitygroup_id   = ["securitygroup_id_external"]
-  availabilityZones           =  var.availabilityZones
+  source                      = "../../"
+  prefix                      = "bigip-aws-2nic"
+  ec2_key_name                = aws_key_pair.generated_key.key_name
+  mgmt_subnet_ids             = [{ "subnet_id" = "subnet_id_mgmt", "public_ip" = true }]
+  mgmt_securitygroup_ids      = ["securitygroup_id_mgmt"]
+  external_subnet_ids         = [{ "subnet_id" = "subnet_id_external", "public_ip" = true }]
+  external_securitygroup_ids  = ["securitygroup_id_external"]
 }
 
-
-Example 3-NIC Deployment  Module usage
-
+#
+#Example 3-NIC Deployment  Module usage
+#
 module bigip {
-  source                      = "../"
-  dnsLabel                    = "bigip-azure-3nic"
-  resource_group_name         = "testbigip"
-  mgmt_subnet_id              = [{"subnet_id" = "subnet_id_mgmt" , "public_ip" = true}]
-  mgmt_securitygroup_id       = ["securitygroup_id_mgmt"]
-  external_subnet_id          = [{"subnet_id" =  "subnet_id_external", "public_ip" = true }]
-  external_securitygroup_id   = ["securitygroup_id_external"]
-  internal_subnet_id          = [{"subnet_id" =  "subnet_id_internal", "public_ip"=false }]
-  internal_securitygroup_id   = ["securitygropu_id_internal"]
-  availabilityZones           =  var.availabilityZones
+  source                      = "../../"
+  prefix                      = "bigip-aws-3nic"
+  ec2_key_name                = aws_key_pair.generated_key.key_name
+  mgmt_subnet_ids             = [{ "subnet_id" = "subnet_id_mgmt", "public_ip" = true }]
+  mgmt_securitygroup_ids      = ["securitygroup_id_mgmt"]
+  external_subnet_ids         = [{ "subnet_id" = "subnet_id_external", "public_ip" = true }]
+  external_securitygroup_ids  = ["securitygroup_id_external"]
+  internal_subnet_ids         = [{"subnet_id" =  "subnet_id_internal", "public_ip"=false }]
+  internal_securitygroup_ids  = ["securitygropu_id_internal"]
 }
 
 ```
@@ -62,7 +58,7 @@ These variables must be set in the module block when using this module.
 
 | Name | Description | Type | 
 |------|-------------|------|
-| dnsLabel/prefix | This value is inserted in the beginning of each Azure object. Note: requires alpha-numeric without special character | `string` |
+| prefix | This value is inserted in the beginning of each Azure object. Note: requires alpha-numeric without special character | `string` |
 | resource\_group\_name | The name of the resource group in which the resources will be created | `string` |
 | mgmt\_subnet\_ids | Map with Subnet-id and public_ip as keys for the management subnet | `List of Maps` |
 | mgmt\_securitygroup\_ids | securitygroup\_ids for the management interface | `List` |
