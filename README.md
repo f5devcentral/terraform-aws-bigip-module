@@ -5,7 +5,7 @@ This Terraform module deploys N-nic F5 BIG-IP in AWS cloud
 
 ## Example Usage
 
-We have provided some common deployment [examples](https://github.com/f5devcentral/terraform-azure-bigip-module/tree/master/examples) 
+We have provided some common deployment [examples](https://github.com/RavinderReddyF5/terraform-aws-deploy-bigip/tree/master/examples) 
 
 below example snippet show how this module called.
 
