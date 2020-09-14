@@ -178,12 +178,12 @@ module bigip {
   prefix                      = format("%s-3nic", var.prefix)
   ec2_key_name                = aws_key_pair.generated_key.key_name
   aws_secretmanager_secret_id = aws_secretsmanager_secret.bigip.id
-  mgmt_subnet_id              = [{ "subnet_id" = aws_subnet.mgmt.id, "public_ip" = true }]
-  mgmt_securitygroup_id       = [module.mgmt-network-security-group.this_security_group_id]
-  external_securitygroup_id   = [module.external-network-security-group-public.this_security_group_id]
-  internal_securitygroup_id   = [module.internal-network-security-group-public.this_security_group_id]
-  external_subnet_id          = [{ "subnet_id" = aws_subnet.external-public.id, "public_ip" = true }]
-  internal_subnet_id          = [{ "subnet_id" = aws_subnet.internal.id, "public_ip" = false }]
+  mgmt_subnet_ids             = [{ "subnet_id" = aws_subnet.mgmt.id, "public_ip" = true }]
+  mgmt_securitygroup_ids      = [module.mgmt-network-security-group.this_security_group_id]
+  external_securitygroup_ids  = [module.external-network-security-group-public.this_security_group_id]
+  internal_securitygroup_ids  = [module.internal-network-security-group-public.this_security_group_id]
+  external_subnet_ids         = [{ "subnet_id" = aws_subnet.external-public.id, "public_ip" = true }]
+  internal_subnet_ids         = [{ "subnet_id" = aws_subnet.internal.id, "public_ip" = false }]
   //depends_on                  = [aws_secretsmanager_secret.bigip]
 }
 
