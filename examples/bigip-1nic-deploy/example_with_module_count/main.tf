@@ -69,7 +69,7 @@ resource "aws_route_table" "internet-gw" {
 resource "aws_subnet" "mgmt" {
   vpc_id            = module.vpc.vpc_id
   cidr_block        = cidrsubnet(var.cidr, 8, 1)
-  availability_zone = "us-east-1a"
+  availability_zone = format("%sa", var.region)
 
   tags = {
     Name = "management"
@@ -113,7 +113,8 @@ resource "aws_key_pair" "generated_key" {
 # Create BIG-IP
 #
 module bigip {
-  source       = "../../"
+  source       = "../../../"
+  count   		= var.instance_count
   prefix       = format("%s-1nic", var.prefix)
   ec2_key_name = aws_key_pair.generated_key.key_name
   #  aws_secretmanager_secret_id = aws_secretsmanager_secret.bigip.id
@@ -122,15 +123,15 @@ module bigip {
 }
 
 resource "null_resource" "clusterDO" {
-
+  count = var.instance_count
   provisioner "local-exec" {
-    command = "cat > DO_1nic.json <<EOL\n ${module.bigip.onboard_do}\nEOL"
+    command = "cat > DO_1nic.json <<EOL\n ${module.bigip[count.index].onboard_do}\nEOL"
   }
   provisioner "local-exec" {
     when    = destroy
     command = "rm -rf DO_1nic.json"
   }
-  depends_on = [module.bigip.onboard_do]
+  depends_on = [module.bigip]
 }
 
 

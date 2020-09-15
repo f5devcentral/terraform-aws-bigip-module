@@ -44,13 +44,13 @@ module "vpc" {
 
   azs = var.availabilityZones
 
-
   tags = {
     Name        = format("%s-vpc-%s", var.prefix, random_id.id.hex)
     Terraform   = "true"
     Environment = "dev"
   }
 }
+
 resource "aws_internet_gateway" "gw" {
   vpc_id = module.vpc.vpc_id
 
@@ -75,12 +75,6 @@ resource "aws_subnet" "mgmt" {
     Name = "management"
   }
 }
-
-resource "aws_route_table_association" "route_table_management" {
-  subnet_id      = aws_subnet.mgmt.id
-  route_table_id = aws_route_table.internet-gw.id
-}
-
 resource "aws_subnet" "external-public" {
   vpc_id            = module.vpc.vpc_id
   cidr_block        = cidrsubnet(var.cidr, 8, 2)
@@ -90,12 +84,25 @@ resource "aws_subnet" "external-public" {
     Name = "external"
   }
 }
+resource "aws_subnet" "internal" {
+  vpc_id            = module.vpc.vpc_id
+  cidr_block        = cidrsubnet(var.cidr, 8, 3)
+  availability_zone = format("%sa", var.region)
+
+  tags = {
+    Name = "internal"
+  }
+}
+
+resource "aws_route_table_association" "route_table_mgmt" {
+  subnet_id      = aws_subnet.mgmt.id
+  route_table_id = aws_route_table.internet-gw.id
+}
 
 resource "aws_route_table_association" "route_table_external" {
   subnet_id      = aws_subnet.external-public.id
   route_table_id = aws_route_table.internet-gw.id
 }
-
 
 #
 # Create a security group for BIG-IP
@@ -135,31 +142,50 @@ module "mgmt-network-security-group" {
 
 }
 
+#
+# Create a security group for BIG-IP
+#
+module "internal-network-security-group-public" {
+  source = "terraform-aws-modules/security-group/aws"
+
+  name        = format("%s-internal-nsg-%s", var.prefix, random_id.id.hex)
+  description = "Security group for BIG-IP "
+  vpc_id      = module.vpc.vpc_id
+
+  ingress_cidr_blocks = var.AllowedIPs
+  ingress_rules       = ["http-80-tcp", "https-443-tcp"]
+
+  # Allow ec2 instances outbound Internet connectivity
+  egress_cidr_blocks = ["0.0.0.0/0"]
+  egress_rules       = ["all-all"]
+
+}
 resource "tls_private_key" "example" {
   algorithm = "RSA"
   rsa_bits  = 4096
-  //ecdsa_curve = "P384"
 }
-
-
 
 resource "aws_key_pair" "generated_key" {
   key_name   = format("%s-%s-%s", var.prefix, var.ec2_key_name, random_id.id.hex)
   public_key = tls_private_key.example.public_key_openssh
-  //public_key = file("/Users/chinthalapalli/.ssh/id_rsa.pub")
 }
+
 #
 # Create BIG-IP
 #
 module bigip {
-  source                      = "../../"
-  prefix                      = format("%s-2nic", var.prefix)
+  source                      = "../../../"
+  count                       = var.instance_count
+  prefix                      = format("%s-3nic", var.prefix)
   ec2_key_name                = aws_key_pair.generated_key.key_name
   aws_secretmanager_secret_id = aws_secretsmanager_secret.bigip.id
   mgmt_subnet_ids             = [{ "subnet_id" = aws_subnet.mgmt.id, "public_ip" = true }]
   mgmt_securitygroup_ids      = [module.mgmt-network-security-group.this_security_group_id]
   external_securitygroup_ids  = [module.external-network-security-group-public.this_security_group_id]
-  external_subnet_ids         = [{ "subnet_id" = aws_subnet.external-public.id, "public_ip" = true }]
+  internal_securitygroup_ids  = [module.internal-network-security-group-public.this_security_group_id]
+  external_subnet_ids         = [{ "subnet_id" = aws_subnet.external-public.id, "public_ip" = false }]
+  internal_subnet_ids         = [{ "subnet_id" = aws_subnet.internal.id, "public_ip" = false }]
+  //depends_on                  = [aws_secretsmanager_secret.bigip]
 }
 
 #
