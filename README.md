@@ -1,11 +1,23 @@
 ## Deploys BIG-IP in AWS Cloud
 
-This Terraform module deploys N-nic F5 BIG-IP in AWS cloud
+This Terraform module deploys N-nic F5 BIG-IP in AWS cloud,and with module count feature we can also deploy multiple instances of BIG-IP.
+
+## Prerequisites
+
+This module is supported from Terraform 0.13 version onwards.
+
+Below templates are tested and worked in the following version 
+
+Terraform v0.13.0
++ provider registry.terraform.io/hashicorp/azurerm v2.28.0
++ provider registry.terraform.io/hashicorp/null v2.1.2
++ provider registry.terraform.io/hashicorp/random v2.3.0
++ provider registry.terraform.io/hashicorp/template v2.1.2
 
 
 ## Example Usage
 
-We have provided some common deployment [examples](https://github.com/RavinderReddyF5/terraform-aws-deploy-bigip/tree/master/examples) 
+We have provided some common deployment [examples](https://github.com/f5devcentral/terraform-aws-bigip-module/tree/master/examples)
 
 below example snippet show how this module called.
 

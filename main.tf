@@ -1,11 +1,11 @@
 locals {
   bigip_map = {
-    "mgmt_subnet_ids"           = var.mgmt_subnet_ids
-    "mgmt_securitygroup_id"     = var.mgmt_securitygroup_ids
-    "external_subnet_id"        = var.external_subnet_ids
-    "external_securitygroup_id" = var.external_securitygroup_ids
-    "internal_subnet_id"        = var.internal_subnet_ids
-    "internal_securitygroup_id" = var.internal_securitygroup_ids
+    "mgmt_subnet_ids"            = var.mgmt_subnet_ids
+    "mgmt_securitygroup_ids"     = var.mgmt_securitygroup_ids
+    "external_subnet_ids"        = var.external_subnet_ids
+    "external_securitygroup_ids" = var.external_securitygroup_ids
+    "internal_subnet_ids"        = var.internal_subnet_ids
+    "internal_securitygroup_ids" = var.internal_securitygroup_ids
   }
   mgmt_public_subnet_id = [
     for subnet in local.bigip_map["mgmt_subnet_ids"] :
@@ -18,7 +18,7 @@ locals {
     if subnet["public_ip"] == true
   ]
   mgmt_public_security_id = [
-    for i in local.mgmt_public_index : local.bigip_map["mgmt_securitygroup_id"][i]
+    for i in local.mgmt_public_index : local.bigip_map["mgmt_securitygroup_ids"][i]
   ]
   mgmt_private_subnet_id = [
     for subnet in local.bigip_map["mgmt_subnet_ids"] :
@@ -31,59 +31,59 @@ locals {
     if subnet["public_ip"] == false
   ]
   mgmt_private_security_id = [
-    for i in local.external_private_index : local.bigip_map["mgmt_securitygroup_id"][i]
+    for i in local.external_private_index : local.bigip_map["mgmt_securitygroup_ids"][i]
   ]
   external_public_subnet_id = [
-    for subnet in local.bigip_map["external_subnet_id"] :
+    for subnet in local.bigip_map["external_subnet_ids"] :
     subnet["subnet_id"]
     if subnet["public_ip"] == true
   ]
   external_public_index = [
-    for index, subnet in local.bigip_map["external_subnet_id"] :
+    for index, subnet in local.bigip_map["external_subnet_ids"] :
     index
     if subnet["public_ip"] == true
   ]
   external_public_security_id = [
-    for i in local.external_public_index : local.bigip_map["external_securitygroup_id"][i]
+    for i in local.external_public_index : local.bigip_map["external_securitygroup_ids"][i]
   ]
   external_private_subnet_id = [
-    for subnet in local.bigip_map["external_subnet_id"] :
+    for subnet in local.bigip_map["external_subnet_ids"] :
     subnet["subnet_id"]
     if subnet["public_ip"] == false
   ]
   external_private_index = [
-    for index, subnet in local.bigip_map["external_subnet_id"] :
+    for index, subnet in local.bigip_map["external_subnet_ids"] :
     index
     if subnet["public_ip"] == false
   ]
   external_private_security_id = [
-    for i in local.external_private_index : local.bigip_map["external_securitygroup_id"][i]
+    for i in local.external_private_index : local.bigip_map["external_securitygroup_ids"][i]
   ]
   internal_public_subnet_id = [
-    for subnet in local.bigip_map["internal_subnet_id"] :
+    for subnet in local.bigip_map["internal_subnet_ids"] :
     subnet["subnet_id"]
     if subnet["public_ip"] == true
   ]
   internal_public_index = [
-    for index, subnet in local.bigip_map["internal_subnet_id"] :
+    for index, subnet in local.bigip_map["internal_subnet_ids"] :
     index
     if subnet["public_ip"] == true
   ]
   internal_public_security_id = [
-    for i in local.internal_public_index : local.bigip_map["internal_securitygroup_id"][i]
+    for i in local.internal_public_index : local.bigip_map["internal_securitygroup_ids"][i]
   ]
   internal_private_subnet_id = [
-    for subnet in local.bigip_map["internal_subnet_id"] :
+    for subnet in local.bigip_map["internal_subnet_ids"] :
     subnet["subnet_id"]
     if subnet["public_ip"] == false
   ]
   internal_private_index = [
-    for index, subnet in local.bigip_map["internal_subnet_id"] :
+    for index, subnet in local.bigip_map["internal_subnet_ids"] :
     index
     if subnet["public_ip"] == false
   ]
   internal_private_security_id = [
-    for i in local.internal_private_index : local.bigip_map["internal_securitygroup_id"][i]
+    for i in local.internal_private_index : local.bigip_map["internal_securitygroup_ids"][i]
   ]
   total_nics       = length(concat(local.mgmt_public_subnet_id, local.mgmt_private_subnet_id, local.external_public_subnet_id, local.external_private_subnet_id, local.internal_public_subnet_id, local.internal_private_subnet_id))
   vlan_list        = concat(local.external_public_subnet_id, local.external_private_subnet_id, local.internal_public_subnet_id, local.internal_private_subnet_id)
@@ -176,10 +176,10 @@ resource "aws_eip" "ext-pub" {
 # Create Public External Network Interfaces
 #
 resource "aws_network_interface" "public" {
-  count           = length(local.external_public_subnet_id)
-  subnet_id       = local.external_public_subnet_id[count.index]
-  security_groups = var.external_securitygroup_ids
-  //private_ips_count = var.application_endpoint_count
+  count             = length(local.external_public_subnet_id)
+  subnet_id         = local.external_public_subnet_id[count.index]
+  security_groups   = var.external_securitygroup_ids
+  private_ips_count = 1
   tags = {
     Name   = format("%s-%d", "BIGIP-External-Public-Interface", count.index)
     Prefix = format("%s", local.instance_prefix)
@@ -190,9 +190,10 @@ resource "aws_network_interface" "public" {
 # Create Private External Network Interfaces
 #
 resource "aws_network_interface" "external_private" {
-  count           = length(local.external_private_subnet_id)
-  subnet_id       = local.external_private_subnet_id[count.index]
-  security_groups = var.external_securitygroup_ids
+  count             = length(local.external_private_subnet_id)
+  subnet_id         = local.external_private_subnet_id[count.index]
+  security_groups   = var.external_securitygroup_ids
+  private_ips_count = 1
   //private_ips_count = var.application_endpoint_count
   tags = {
     Name   = format("%s-%d", "BIGIP-External-Private-Interface", count.index)
