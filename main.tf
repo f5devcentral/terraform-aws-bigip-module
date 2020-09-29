@@ -301,6 +301,7 @@ data template_file clustermemberDO2 {
     ntp_servers   = join(",", formatlist("\"%s\"", ["0.pool.ntp.org", "1.pool.ntp.org", "2.pool.ntp.org"]))
     vlan-name     = element(split("/", local.vlan_list[0]), length(split("/", local.vlan_list[0])) - 1)
     self-ip       = local.selfip_list[0]
+    gateway       = cidrhost(format("%s/24", local.selfip_list[0]), 1)
   }
   depends_on = [aws_network_interface.public, aws_network_interface.private]
 }
@@ -315,6 +316,7 @@ data template_file clustermemberDO3 {
     ntp_servers   = join(",", formatlist("\"%s\"", ["0.pool.ntp.org", "1.pool.ntp.org", "2.pool.ntp.org"]))
     vlan-name1    = element(split("/", local.vlan_list[0]), length(split("/", local.vlan_list[0])) - 1)
     self-ip1      = local.selfip_list[0]
+    gateway       = cidrhost(format("%s/24", local.selfip_list[0]), 1)
     vlan-name2    = element(split("/", local.vlan_list[1]), length(split("/", local.vlan_list[1])) - 1)
     self-ip2      = local.selfip_list[1]
   }
