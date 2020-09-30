@@ -1,16 +1,15 @@
-
 # BIG-IP Management Public IP Addresses
-output "bigip_mgmt_ips" {
+output bigip_mgmt_ips {
   value = module.bigip.*.mgmt_public_ips
 }
 
 # BIG-IP Management Public DNS Address
-output "bigip_mgmt_dns" {
+output bigip_mgmt_dns {
   value = module.bigip.*.mgmt_public_dns
 }
 
 # BIG-IP Management Port
-output "bigip_mgmt_port" {
+output bigip_mgmt_port {
   value = module.bigip.*.mgmt_port
 }
 
@@ -20,7 +19,7 @@ output bigip_username {
 }
 
 # BIG-IP Password
-output "password" {
+output bigip_password {
   value = module.bigip.*.bigip_password
 }
 
