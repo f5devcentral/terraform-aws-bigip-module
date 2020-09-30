@@ -6,14 +6,14 @@ This Terraform module deploys N-nic F5 BIG-IP in AWS cloud,and with module count
 
 This module is supported from Terraform 0.13 version onwards.
 
-Below templates are tested and worked in the following version 
+It is tested against following provider/terraform versions 
 
 Terraform v0.13.0
-+ provider registry.terraform.io/hashicorp/azurerm v2.28.0
-+ provider registry.terraform.io/hashicorp/null v2.1.2
+
++ provider registry.terraform.io/hashicorp/aws v3.8.0
 + provider registry.terraform.io/hashicorp/random v2.3.0
 + provider registry.terraform.io/hashicorp/template v2.1.2
-
++ provider registry.terraform.io/hashicorp/null v2.1.2
 
 ## Example Usage
 
