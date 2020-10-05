@@ -23,6 +23,12 @@ output bigip_password {
   value = module.bigip.*.bigip_password
 }
 
+# VPC ID used for BIG-IP Deploy
+output vpc_id {
+  value = module.vpc.vpc_id
+}
+
+
 /*
 # BIG-IP Password Secret name
 output "aws_secretmanager_secret_name" {
