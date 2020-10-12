@@ -52,7 +52,7 @@ locals {
     if subnet["public_ip"] == false
   ]
   mgmt_private_security_id = [
-    for i in local.external_private_index : local.bigip_map["mgmt_securitygroup_ids"][i]
+    for i in local.mgmt_private_index : local.bigip_map["mgmt_securitygroup_ids"][i]
   ]
   external_public_subnet_id = [
     for subnet in local.bigip_map["external_subnet_ids"] :
@@ -265,7 +265,7 @@ resource "aws_instance" "f5_bigip" {
 
     content {
       network_interface_id = network_interface.value
-      device_index         = 1
+      device_index         = 1 + index(tolist(toset(local.ext_interfaces)), network_interface.value)
     }
   }
 
@@ -275,7 +275,7 @@ resource "aws_instance" "f5_bigip" {
 
     content {
       network_interface_id = network_interface.value
-      device_index         = 2
+      device_index         = (length(local.ext_interfaces) + 1) + index(tolist(toset([aws_network_interface.private[count.index].id])), network_interface.value)
     }
   }
 
@@ -328,7 +328,7 @@ data template_file clustermemberDO2 {
 }
 
 data template_file clustermemberDO3 {
-  count    = local.total_nics == 3 ? 1 : 0
+  count    = local.total_nics >= 3 ? 1 : 0
   template = file("${path.module}/onboard_do_3nic.tpl")
   vars = {
     hostname      = aws_eip.mgmt[0].public_dns
