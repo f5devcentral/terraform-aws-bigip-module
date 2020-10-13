@@ -52,6 +52,11 @@ output selfip_list {
   value = local.selfip_list
 }
 
+output bigip_nic_ids {
+  value = concat(aws_network_interface.public.*.id, aws_network_interface.external_private.*.id, aws_network_interface.private.*.id)
+  //value = local.bigip_nics_map
+}
+
 output onboard_do {
   value      = local.total_nics > 1 ? (local.total_nics == 2 ? data.template_file.clustermemberDO2[0].rendered : data.template_file.clustermemberDO3[0].rendered) : data.template_file.clustermemberDO1[0].rendered
   depends_on = [data.template_file.clustermemberDO1[0], data.template_file.clustermemberDO2[0], data.template_file.clustermemberDO3[0]]

@@ -188,6 +188,16 @@ module bigip {
   //depends_on                  = [aws_secretsmanager_secret.bigip]
 }
 
+data aws_network_interface bigip_nics {
+  //for_each   = length(local.ext_interfaces) > 1 ? toset(local.ext_interfaces) : toset([])
+  //count = length(module.bigip[*].bigip_nic_ids)
+  count = var.instance_count
+  id = [
+    for value in module.bigip[count.index].bigip_nic_ids :
+  value][0]
+}
+
+
 #
 # Variables used by this example
 #

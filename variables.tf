@@ -1,7 +1,7 @@
 variable prefix {
   description = "Prefix for resources created by this module"
   type        = string
-  default     = "tf-aws-bigip"
+  //default     = "tf-aws-bigip"
 }
 
 variable f5_username {
@@ -21,12 +21,6 @@ variable f5_instance_count {
   default     = 1
 }
 
-variable application_endpoint_count {
-  description = "number of public application addresses to assign"
-  type        = number
-  default     = 1
-}
-
 variable ec2_instance_type {
   description = "AWS EC2 instance type"
   type        = string
@@ -36,7 +30,7 @@ variable ec2_instance_type {
 variable ec2_key_name {
   description = "AWS EC2 Key name for SSH access"
   type        = string
-  default     = "tf-demo-key"
+  //default     = "tf-demo-key"
 }
 
 variable mgmt_eip {
@@ -82,7 +76,6 @@ variable internal_subnet_ids {
   }))
   default = [{ "subnet_id" = null, "public_ip" = null }]
 }
-
 
 variable mgmt_securitygroup_ids {
   description = "The Network Security Group ids for management network "

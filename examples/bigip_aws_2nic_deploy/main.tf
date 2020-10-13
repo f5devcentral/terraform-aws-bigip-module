@@ -161,6 +161,24 @@ module bigip {
   external_subnet_ids         = [{ "subnet_id" = aws_subnet.external-public.id, "public_ip" = true }]
 }
 
+data aws_network_interface bigip_nics {
+  //for_each   = length(local.ext_interfaces) > 1 ? toset(local.ext_interfaces) : toset([])
+  count = var.instance_count
+  id    = [
+    for value in module.bigip[count.index].bigip_nic_ids:
+    value][0]
+}
+
+// data "aws_network_interface" "bigip_nic" {
+//   for_each   = length(module.bigip.bigip_ext_nics) > 1 ? toset(module.bigip.ext_interfaces) : toset([])
+//   id         = each.value
+//   depends_on = [module.bigip]
+// }
+
+// data "aws_network_interfaces" "aws_bigip_module" {
+//   depends_on = [module.bigip]
+// }
+
 #
 # Variables used by this example
 #

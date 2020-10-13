@@ -111,6 +111,8 @@ locals {
   selfip_list_temp = concat(aws_network_interface.public.*.private_ips, aws_network_interface.external_private.*.private_ips, aws_network_interface.private.*.private_ips)
   ext_interfaces   = concat(aws_network_interface.public.*.id, aws_network_interface.external_private.*.id)
   selfip_list      = flatten(local.selfip_list_temp)
+  //bigip_nics       = concat(aws_network_interface.public.*.id, aws_network_interface.external_private.*.id,aws_network_interface.private.*.id)
+  //bigip_nics_map   = concat(data.aws_network_interfaces.bigip_nic.*.private_ip)
   //azurerm_network_interface.external_public_nic.*.private_ip_address, azurerm_network_interface.internal_nic.*.private_ip_address)
   instance_prefix = format("%s-%s", var.prefix, random_id.module_id.hex)
 
@@ -215,7 +217,6 @@ resource "aws_network_interface" "external_private" {
   subnet_id         = local.external_private_subnet_id[count.index]
   security_groups   = var.external_securitygroup_ids
   private_ips_count = 1
-  //private_ips_count = var.application_endpoint_count
   tags = {
     Name   = format("%s-%d", "BIGIP-External-Private-Interface", count.index)
     Prefix = format("%s", local.instance_prefix)
@@ -343,3 +344,9 @@ data template_file clustermemberDO3 {
   }
   depends_on = [aws_network_interface.public, aws_network_interface.private]
 }
+
+// data aws_network_interface bigip_nics {
+//   //for_each   = length(local.ext_interfaces) > 1 ? toset(local.ext_interfaces) : toset([])
+//   count = length(local.bigip_nics)
+//   id    = local.bigip_nics[count.index]
+// }

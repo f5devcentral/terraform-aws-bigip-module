@@ -28,6 +28,10 @@ output vpc_id {
   value = module.vpc.vpc_id
 }
 
+output bigip_nics {
+  //value = data.aws_network_interfaces.bigip_nic.ids
+  value = module.bigip.*.bigip_nic_ids
+}
 
 /*
 # BIG-IP Password Secret name
