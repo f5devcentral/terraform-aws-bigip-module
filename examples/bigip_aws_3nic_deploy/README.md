@@ -54,6 +54,7 @@ $ terraform destroy
 | mgmtPublicURL | Complete url including DNS and port|
 | private\_addresses | List of BIG-IP private addresses |
 | public\_addresses | List of BIG-IP public addresses |
+| vpc\_id | VPC Id where BIG-IP Deployed |
 
 
 
