@@ -28,9 +28,12 @@ output vpc_id {
   value = module.vpc.vpc_id
 }
 
-output bigip_nics {
-  //value = data.aws_network_interfaces.bigip_nic.ids
-  value = module.bigip.*.bigip_nic_ids
+output bigip_privateips {
+  value = module.bigip.*.bigip_privateips
+}
+
+output bigip_publicips {
+  value = module.bigip.*.bigip_publicips
 }
 
 /*

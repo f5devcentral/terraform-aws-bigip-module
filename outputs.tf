@@ -16,25 +16,9 @@ output mgmt_port {
   value       = local.total_nics > 1 ? "443" : "8443"
 }
 
-# Public Network Interface
-output public_nic_ids {
-  description = "List of BIG-IP public network interface ids"
-  value       = aws_network_interface.public[*].id
-}
-
 output mgmt_addresses {
   description = "List of BIG-IP management addresses"
   value       = aws_network_interface.mgmt[*].private_ips
-}
-
-output public_addresses {
-  description = "List of BIG-IP public addresses"
-  value       = aws_network_interface.public[*].private_ips
-}
-
-output private_addresses {
-  description = "List of BIG-IP private addresses"
-  value       = aws_network_interface.private[*].private_ips
 }
 
 output f5_username {
@@ -48,8 +32,12 @@ output bigip_password {
   value       = var.aws_secretmanager_auth ? data.aws_secretsmanager_secret_version.current[0].secret_string : random_string.dynamic_password.result
 }
 
-output selfip_list {
-  value = local.selfip_list
+output bigip_privateips {
+  value = concat(aws_network_interface.public.*.private_ips, aws_network_interface.external_private.*.private_ips, aws_network_interface.private.*.private_ips)
+}
+
+output bigip_publicips {
+  value = concat(aws_eip.ext-pub.*.public_ip)
 }
 
 output bigip_nic_ids {

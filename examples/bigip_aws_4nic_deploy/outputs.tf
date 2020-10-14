@@ -28,6 +28,14 @@ output vpc_id {
   value = module.vpc.vpc_id
 }
 
+output bigip_privateips {
+  value = module.bigip.*.bigip_privateips
+}
+
+output bigip_publicips {
+  value = module.bigip.*.bigip_publicips
+}
+
 
 /*
 # BIG-IP Password Secret name
