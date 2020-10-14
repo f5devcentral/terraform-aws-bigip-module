@@ -1,20 +1,20 @@
 # BIG-IP Management Public IP Addresses
-output bigip_mgmt_ips {
-  value = module.bigip.*.mgmt_public_ips
+output mgmtPublicIP {
+  value = module.bigip.*.mgmtPublicIP
 }
 
 # BIG-IP Management Public DNS Address
-output bigip_mgmt_dns {
-  value = module.bigip.*.mgmt_public_dns
+output mgmtPublicDNS {
+  value = module.bigip.*.mgmtPublicDNS
 }
 
 # BIG-IP Management Port
-output bigip_mgmt_port {
-  value = module.bigip.*.mgmt_port
+output mgmtPort {
+  value = module.bigip.*.mgmtPort
 }
 
 # BIG-IP Username
-output bigip_username {
+output f5_username {
   value = module.bigip.*.f5_username
 }
 
@@ -23,29 +23,22 @@ output bigip_password {
   value = module.bigip.*.bigip_password
 }
 
+output mgmtPublicURL {
+  description = "mgmtPublicURL"
+  value       = [for i in range(var.instance_count) : format("https://%s:%s", module.bigip[i].mgmtPublicDNS[0], module.bigip[i].mgmtPort)]
+}
+
 # VPC ID used for BIG-IP Deploy
 output vpc_id {
   value = module.vpc.vpc_id
 }
 
-output bigip_privateips {
-  value = module.bigip.*.bigip_privateips
+output private_addresses {
+  description = "List of BIG-IP private addresses"
+  value       = module.bigip.*.private_addresses
 }
 
-output bigip_publicips {
-  value = module.bigip.*.bigip_publicips
+output public_addresses {
+  description = "List of BIG-IP public addresses"
+  value       = module.bigip.*.public_addresses
 }
-
-
-/*
-# BIG-IP Password Secret name
-output "aws_secretmanager_secret_name" {
-  value = aws_secretsmanager_secret.bigip.name
-}
-
-# BIG-IP Password Secret name
-output "tls_rsa_private_key" {
-  value = tls_private_key.example.private_key_pem
-}
-*/
-

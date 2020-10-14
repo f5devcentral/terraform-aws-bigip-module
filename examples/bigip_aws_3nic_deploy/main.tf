@@ -183,20 +183,22 @@ module bigip {
   mgmt_securitygroup_ids      = [module.mgmt-network-security-group.this_security_group_id]
   external_securitygroup_ids  = [module.external-network-security-group-public.this_security_group_id]
   internal_securitygroup_ids  = [module.internal-network-security-group-public.this_security_group_id]
-  external_subnet_ids         = [{ "subnet_id" = aws_subnet.external-public.id, "public_ip" = false }]
+  external_subnet_ids         = [{ "subnet_id" = aws_subnet.external-public.id, "public_ip" = true }]
   internal_subnet_ids         = [{ "subnet_id" = aws_subnet.internal.id, "public_ip" = false }]
   //depends_on                  = [aws_secretsmanager_secret.bigip]
 }
 
-// data aws_network_interface bigip_nics {
-//   //for_each   = length(local.ext_interfaces) > 1 ? toset(local.ext_interfaces) : toset([])
-//   //count = length(module.bigip[*].bigip_nic_ids)
-//   count = var.instance_count
-//   id = [
-//     for value in module.bigip[count.index].bigip_nic_ids :
-//   value][0]
-// }
-
+resource "null_resource" "clusterDO" {
+  count = var.instance_count
+  provisioner "local-exec" {
+    command = "cat > DO_3nic-instance${count.index}.json <<EOL\n ${module.bigip[count.index].onboard_do}\nEOL"
+  }
+  provisioner "local-exec" {
+    when    = destroy
+    command = "rm -rf DO_3nic-instance${count.index}.json"
+  }
+  depends_on = [module.bigip.onboard_do]
+}
 
 #
 # Variables used by this example

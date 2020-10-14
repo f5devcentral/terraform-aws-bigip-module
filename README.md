@@ -124,6 +124,7 @@ These variables must be set in the module block when using this module.
 | ec2_key_name 	| AWS EC2 Key name for SSH access 	| string 	|  	|
 | mgmt\_subnet\_ids | Map with Subnet-id and public_ip as keys for the management subnet | `List of Maps` |
 | mgmt\_securitygroup\_ids | securitygroup\_ids for the management interface | `List` |
+| instance\_count | Number of Bigip instances to spin up | `number` |
 
 #### Optional Input Variables
 
@@ -144,10 +145,10 @@ These variables have default values and don't have to be set to use this module.
 | CFE_URL | URL to download the BIG-IP Cloud Failover Extension module | `string` | latest |
 | libs\_dir | Directory on the BIG-IP to download the A&O Toolchain into | `string` | /config/cloud/aws/node_modules |
 | onboard\_log | Directory on the BIG-IP to store the cloud-init logs | `string` | /var/log/startup-script.log |
-| external\_subnet\_id | he subnet id of the virtual network where the virtual machines will reside | `List of Maps` | [{ "subnet_id" = null, "public_ip" = null }] |
-| internal\_subnet\_id | The subnet id of the virtual network where the virtual machines will reside | `List of Maps` | [{ "subnet_id" = null, "public_ip" = null }] |
-| external\_securitygroup\_id | The Network Security Group ids for external network | `List` | [] |
-| internal\_securitygroup\_id | The Network Security Group ids for internal network | `List` | [] |
+| external\_subnet\_ids | he subnet id of the virtual network where the virtual machines will reside | `List of Maps` | [{ "subnet_id" = null, "public_ip" = null }] |
+| internal\_subnet\_ids | The subnet id of the virtual network where the virtual machines will reside | `List of Maps` | [{ "subnet_id" = null, "public_ip" = null }] |
+| external\_securitygroup\_ids | The Network Security Group ids for external network | `List` | [] |
+| internal\_securitygroup\_ids | The Network Security Group ids for internal network | `List` | [] |
 
 #### Output Variables
 | Name | Description |
@@ -157,6 +158,8 @@ These variables have default values and don't have to be set to use this module.
 | mgmtPort | Mgmt Port |
 | f5\_username | BIG-IP username |
 | bigip\_password | BIG-IP Password (if dynamic_password is choosen it will be random generated password or if azure_keyvault is choosen it will be key vault secret name ) |
+| private\_addresses | List of BIG-IP private addresses |
+| public\_addresses | List of BIG-IP public addresses |
 
 
 ```
