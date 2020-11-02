@@ -37,8 +37,8 @@ $ terraform destroy
 
 | Name | Description | Type | Default |
 |------|-------------|------|---------|
-| prefix | Prefix for resources created by this module | `string` | tf-azure-bigip |
-| cidr | Azure VPC CIDR | `string` | 10.2.0.0/16 |
+| prefix | Prefix for resources created by this module | `string` | tf-aws-bigip |
+| cidr | aws VPC CIDR | `string` | 10.2.0.0/16 |
 | availabilityZones | If you want the VM placed in an Availability Zone, and the AWS region you are deploying to supports it, specify the numbers of the existing Availability Zone you want to use | `List` | ["us-east-1a"] |
 | instance_count | Number of Bigip instances to create | `number` | 1 |
 
@@ -50,7 +50,7 @@ $ terraform destroy
 | mgmtPublicDNS | fqdn to connect to the first vm provisioned |
 | mgmtPort | Mgmt Port |
 | f5\_username | BIG-IP username |
-| bigip\_password | BIG-IP Password (if dynamic_password is choosen it will be random generated password or if azure_keyvault is choosen it will be key vault secret name ) |
+| bigip\_password | BIG-IP Password (if dynamic_password is choosen it will be random generated password or if aws_secretmanager_auth is choosen it will be aws_secretsmanager_secret_version secret string ) |
 | mgmtPublicURL | Complete url including DNS and port|
 | private\_addresses | List of BIG-IP private addresses |
 | public\_addresses | List of BIG-IP public addresses |
