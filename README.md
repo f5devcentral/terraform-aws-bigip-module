@@ -86,7 +86,7 @@ module bigip {
 }
 
 Similarly we can have N-nic deployments based on user provided subnet_ids and securitygroup_ids.
-With module count, user can deploy multiple bigip instances in the azure cloud (with the default value of count being one )
+With module count, user can deploy multiple bigip instances in the aws cloud (with the default value of count being one )
 
 
 ```
@@ -120,7 +120,7 @@ These variables must be set in the module block when using this module.
 
 | Name | Description | Type | 
 |------|-------------|------|
-| prefix | This value is inserted in the beginning of each Azure object. Note: requires alpha-numeric without special character | `string` |
+| prefix | This value is inserted in the beginning of each aws object. Note: requires alpha-numeric without special character | `string` |
 | ec2_key_name 	| AWS EC2 Key name for SSH access 	| string 	|  	|
 | mgmt\_subnet\_ids | Map with Subnet-id and public_ip as keys for the management subnet | `List of Maps` |
 | mgmt\_securitygroup\_ids | securitygroup\_ids for the management interface | `List` |
@@ -157,10 +157,9 @@ These variables have default values and don't have to be set to use this module.
 | mgmtPublicDNS | fqdn to connect to the first vm provisioned |
 | mgmtPort | Mgmt Port |
 | f5\_username | BIG-IP username |
-| bigip\_password | BIG-IP Password (if dynamic_password is choosen it will be random generated password or if azure_keyvault is choosen it will be key vault secret name ) |
+| bigip\_password | BIG-IP Password (if dynamic_password is choosen it will be random generated password or if aws_secretmanager_auth is choosen it will be aws_secretsmanager_secret_version secret string ) |
 | private\_addresses | List of BIG-IP private addresses |
 | public\_addresses | List of BIG-IP public addresses |
-
 
 ```
 NOTE: A local json file will get generated which contains the DO declaration
@@ -173,7 +172,7 @@ This repository is community-supported. Follow instructions below on how to rais
 
 ### Filing Issues and Getting Help
 
-If you come across a bug or other issue, use [GitHub Issues](https://github.com/f5devcentral/terraform-azure-bigip-module/issues) to submit an issue for our team.  You can also see the current known issues on that page, which are tagged with a purple Known Issue label.
+If you come across a bug or other issue, use [GitHub Issues](https://github.com/f5devcentral/terraform-aws-bigip-module/issues) to submit an issue for our team.  You can also see the current known issues on that page, which are tagged with a purple Known Issue label.
 
 ## Copyright
 
