@@ -150,6 +150,9 @@ These variables have default values and don't have to be set to use this module.
 | external\_securitygroup\_ids | The Network Security Group ids for external network | `List` | [] |
 | internal\_securitygroup\_ids | The Network Security Group ids for internal network | `List` | [] |
 
+Note: For each external interface there will be one primary,secondary private ip will be assigned.
+
+
 #### Output Variables
 | Name | Description |
 |------|-------------|
