@@ -15,6 +15,16 @@ Terraform v0.13.0
 + provider registry.terraform.io/hashicorp/template v2.1.2
 + provider registry.terraform.io/hashicorp/null v2.1.2
 
+## Releases and Versioning
+
+This module is supported in the following bigip and terraform version
+
+| BIGIP version | Terraform 0.13 | 
+|---------------|----------------|
+| BIG-IP 15.x  | X |
+| BIG-IP 14.x  | X |
+| BIG-IP 13.x  | X |
+
 ## Example Usage
 
 We have provided some common deployment [examples](https://github.com/f5devcentral/terraform-aws-bigip-module/tree/master/examples)
