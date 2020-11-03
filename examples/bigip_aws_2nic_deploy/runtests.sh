@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # extract the BIG-IP details from the Terraform output
-export BIGIP_MGMT_IP=`terraform output --json | jq -cr '.bigip_mgmt_ips.value[]'[]`
-export BIGIP_USER=`terraform output --json | jq -cr '.bigip_username.value[]'`
+export BIGIP_MGMT_IP=`terraform output --json | jq -cr '.mgmtPublicIP.value[]'[]`
+export BIGIP_USER=`terraform output --json | jq -cr '.f5_username.value[]'`
 export BIGIP_PASSWORD=`terraform output --json | jq -cr '.bigip_password.value[]'`
-export BIGIP_MGMT_PORT=`terraform output --json | jq -cr '.bigip_mgmt_port.value[]'`
+export BIGIP_MGMT_PORT=`terraform output --json | jq -cr '.mgmtPort.value[]'`
 
 export DO_VERSION=1.13.0
 export AS3_VERSION=3.20.0
