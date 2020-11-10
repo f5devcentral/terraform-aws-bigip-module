@@ -30,7 +30,7 @@ This module is supported in the following bigip and terraform version
 We have provided some common deployment [examples](https://github.com/f5devcentral/terraform-aws-bigip-module/tree/master/examples)
 
 #### Note
-There should be one to one mapping between subnet_ids and securitygroupids (for example if we have 2 or more external subnet_ids,we have to give same number of external securitygroupids to module)
+There should be one to one mapping between subnet_ids and securitygroup_ids (for example if we have 2 or more external subnet_ids,we have to give same number of external securitygroup_ids to module)
 
 Below example snippets show how this module is called
 
