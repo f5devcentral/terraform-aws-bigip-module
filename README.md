@@ -32,7 +32,19 @@ We have provided some common deployment [examples](https://github.com/f5devcentr
 #### Note
 There should be one to one mapping between subnet_ids and securitygroup_ids (for example if we have 2 or more external subnet_ids,we have to give same number of external securitygroup_ids to module)
 
-Below example snippets show how this module is called
+Users can have dynamic or static private ip allocation.If primary/secondary private ip value is null, it will be dynamic or else static private ip allocation.
+
+```
+With Static private ip allocation we can assign primary and secondary private ips for external interfaces, whereas primary private ip for management
+and internal interfaces.
+```
+
+If it is static private ip allocation we can't use module count as same private ips will be tried to allocate for multiple 
+bigip instances based on module count.
+
+With Dynamic private ip allocation,we have to pass null value to primary/secondary private ip declaration and module count will be supported.
+
+Below example snippets show how this module is called ( Dynamic private ip allocation )
 
 ```
 
@@ -44,7 +56,7 @@ module bigip {
   source                 = "../../"
   prefix                 = "bigip-aws-1nic"
   ec2_key_name           = aws_key_pair.generated_key.key_name
-  mgmt_subnet_ids        = [{ "subnet_id" = "subnet_id_mgmt", "public_ip" = true }]
+  mgmt_subnet_ids        = [{ "subnet_id" = "subnet_id_mgmt", "public_ip" = true, "private_ip_primary" =  ""}]
   mgmt_securitygroup_ids = ["securitygroup_id_mgmt"]
 }
 
@@ -56,9 +68,9 @@ module bigip {
   source                      = "../../"
   prefix                      = "bigip-aws-2nic"
   ec2_key_name                = aws_key_pair.generated_key.key_name
-  mgmt_subnet_ids             = [{ "subnet_id" = "subnet_id_mgmt", "public_ip" = true }]
+  mgmt_subnet_ids             = [{ "subnet_id" = "subnet_id_mgmt", "public_ip" = true, "private_ip_primary" =  ""}]
   mgmt_securitygroup_ids      = ["securitygroup_id_mgmt"]
-  external_subnet_ids         = [{ "subnet_id" = "subnet_id_external", "public_ip" = true }]
+  external_subnet_ids         = [{ "subnet_id" = "subnet_id_external", "public_ip" = true, "private_ip_primary" = "", "private_ip_secondary" = ""}]
   external_securitygroup_ids  = ["securitygroup_id_external"]
 }
 
@@ -70,11 +82,11 @@ module bigip {
   source                      = "../../"
   prefix                      = "bigip-aws-3nic"
   ec2_key_name                = aws_key_pair.generated_key.key_name
-  mgmt_subnet_ids             = [{ "subnet_id" = "subnet_id_mgmt", "public_ip" = true }]
+  mgmt_subnet_ids             = [{ "subnet_id" = "subnet_id_mgmt", "public_ip" = true, "private_ip_primary" =  ""}]
   mgmt_securitygroup_ids      = ["securitygroup_id_mgmt"]
-  external_subnet_ids         = [{ "subnet_id" = "subnet_id_external", "public_ip" = true }]
+  external_subnet_ids         = [{ "subnet_id" = "subnet_id_external", "public_ip" = true, "private_ip_primary" = "", "private_ip_secondary" = ""}]
   external_securitygroup_ids  = ["securitygroup_id_external"]
-  internal_subnet_ids         = [{"subnet_id" =  "subnet_id_internal", "public_ip"=false }]
+  internal_subnet_ids         = [{"subnet_id" =  "subnet_id_internal", "public_ip"=false, "private_ip_primary" = ""}]
   internal_securitygroup_ids  = ["securitygropu_id_internal"]
 }
 
@@ -99,6 +111,25 @@ Similarly we can have N-nic deployments based on user provided subnet_ids and se
 With module count, user can deploy multiple bigip instances in the aws cloud (with the default value of count being one )
 
 
+```
+#### Below is the example snippet for private ip allocation
+
+```
+Example 3-NIC Deployment with static private ip allocation
+
+module bigip {
+  source                      = "../../"
+  count                       = var.instance_count
+  prefix                      = format("%s-3nic", var.prefix)
+  ec2_key_name                = aws_key_pair.generated_key.key_name
+  aws_secretmanager_secret_id = aws_secretsmanager_secret.bigip.id
+  mgmt_subnet_ids             = [{ "subnet_id" = aws_subnet.mgmt.id, "public_ip" = true, "private_ip_primary" = "10.0.1.4"}]
+  mgmt_securitygroup_ids      = [module.mgmt-network-security-group.this_security_group_id]
+  external_securitygroup_ids  = [module.external-network-security-group-public.this_security_group_id]
+  internal_securitygroup_ids  = [module.internal-network-security-group-public.this_security_group_id]
+  external_subnet_ids         = [{ "subnet_id" = aws_subnet.external-public.id, "public_ip" = true, "private_ip_primary" = "10.0.2.4", "private_ip_secondary" = "10.0.2.5"}]
+  internal_subnet_ids         = [{ "subnet_id" = aws_subnet.internal.id, "public_ip" = false, "private_ip_primary" = "10.0.3.4"}]
+}
 ```
 
 ### BIG-IP Automation Toolchain InSpec Profile for testing readiness of Automation Tool Chain components 
