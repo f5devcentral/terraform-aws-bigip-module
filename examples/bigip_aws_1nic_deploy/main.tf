@@ -118,7 +118,7 @@ module bigip {
   prefix       = format("%s-1nic", var.prefix)
   ec2_key_name = aws_key_pair.generated_key.key_name
   #  aws_secretmanager_secret_id = aws_secretsmanager_secret.bigip.id
-  mgmt_subnet_ids        = [{ "subnet_id" = aws_subnet.mgmt.id, "public_ip" = true,"private_ip_primary" = "10.0.1.4"}]
+  mgmt_subnet_ids        = [{ "subnet_id" = aws_subnet.mgmt.id, "public_ip" = true,"private_ip_primary" = ""}]
   mgmt_securitygroup_ids = [module.mgmt-network-security-group.this_security_group_id]
 }
 

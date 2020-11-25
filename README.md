@@ -44,6 +44,10 @@ bigip instances based on module count.
 
 With Dynamic private ip allocation,we have to pass null value to primary/secondary private ip declaration and module count will be supported.
 
+#### Note
+```
+Sometimes it is observed that the given static primary and secondary private ips may get exchanged. This is the limitation present in aws.
+```
 Below example snippets show how this module is called ( Dynamic private ip allocation )
 
 ```
