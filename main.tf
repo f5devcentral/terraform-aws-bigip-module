@@ -203,6 +203,8 @@ data "aws_ami" "f5_ami" {
 #
 # Create Management Network Interfaces
 #
+#This resource is for static  primary and secondary private ips 
+
 resource "aws_network_interface" "mgmt" {
   count           = "${length(compact(local.mgmt_public_private_ip_primary)) > 0 ? length(local.bigip_map["mgmt_subnet_ids"]) : 0}" 
   subnet_id       = local.bigip_map["mgmt_subnet_ids"][count.index]["subnet_id"]
@@ -214,6 +216,9 @@ resource "aws_network_interface" "mgmt" {
   }
 
 }
+
+#This resource is for dynamic  primary and secondary private ips  
+
 resource "aws_network_interface" "mgmt1" {
   count           = "${length(compact(local.mgmt_public_private_ip_primary)) > 0 ? 0 : length(local.bigip_map["mgmt_subnet_ids"])}"
   subnet_id       = local.bigip_map["mgmt_subnet_ids"][count.index]["subnet_id"]
@@ -250,6 +255,8 @@ resource "aws_eip" "ext-pub" {
 #
 # Create Public External Network Interfaces
 #
+#This resource is for static  primary and secondary private ips
+
 resource "aws_network_interface" "public" {
   count             = "${length(compact(local.external_public_private_ip_primary)) > 0 ? length(local.external_public_subnet_id) : 0}"
  #count             = length(local.external_public_subnet_id)
@@ -262,6 +269,8 @@ resource "aws_network_interface" "public" {
     Prefix = format("%s", local.instance_prefix)
   }
 }
+
+#This resource is for dynamic  primary and secondary private ips
 
 resource "aws_network_interface" "public1" {
   count             = "${length(compact(local.external_public_private_ip_primary)) > 0 ? 0 : length(local.external_public_subnet_id)}"
@@ -277,6 +286,8 @@ resource "aws_network_interface" "public1" {
 #
 # Create Private External Network Interfaces
 #
+#This resource is for static  primary and secondary private ips
+
 resource "aws_network_interface" "external_private" {
   count           = "${length(compact(local.external_private_ip_primary)) > 0 ? length(local.external_private_subnet_id) : 0}"
  # count             = length(local.external_private_subnet_id)
@@ -289,6 +300,8 @@ resource "aws_network_interface" "external_private" {
     Prefix = format("%s", local.instance_prefix)
   }
 }
+
+#This resource is for dynamic  primary and secondary private ips
 
 resource "aws_network_interface" "external_private1" {
   count           = "${length(compact(local.external_private_ip_primary)) > 0 ? 0 : length(local.external_private_ip_primary)}"
@@ -304,6 +317,8 @@ resource "aws_network_interface" "external_private1" {
 #
 # Create Private Network Interfaces
 #
+#This resource is for static  primary and secondary private ips
+
 resource "aws_network_interface" "private" {
   count           = "${length(compact(local.internal_private_ip_primary)) > 0 ? length(local.internal_private_subnet_id) : 0}"
   subnet_id       = local.internal_private_subnet_id[count.index]
@@ -315,6 +330,7 @@ resource "aws_network_interface" "private" {
   }
 }
 
+#This resource is for dynamic  primary and secondary private ips
 
 resource "aws_network_interface" "private1" {
   count           = "${length(compact(local.internal_private_ip_primary)) > 0 ? 0 : length(local.internal_private_subnet_id)}"
