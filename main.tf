@@ -147,7 +147,7 @@ locals {
   total_nics       = length(concat(local.mgmt_public_subnet_id, local.mgmt_private_subnet_id, local.external_public_subnet_id, local.external_private_subnet_id, local.internal_public_subnet_id, local.internal_private_subnet_id))
   vlan_list        = concat(local.external_public_subnet_id, local.external_private_subnet_id, local.internal_public_subnet_id, local.internal_private_subnet_id)
   selfip_list_temp = concat(aws_network_interface.public.*.private_ip, aws_network_interface.external_private.*.private_ip, aws_network_interface.private.*.private_ip, aws_network_interface.public1.*.private_ip, aws_network_interface.external_private1.*.private_ip, aws_network_interface.private1.*.private_ip)
-  ext_interfaces   = concat(aws_network_interface.public.*.id, aws_network_interface.external_private.*.id)
+  ext_interfaces   = concat(aws_network_interface.public.*.id,aws_network_interface.public1.*.id,aws_network_interface.external_private.*.id,aws_network_interface.external_private1.*.id)
   selfip_list      = flatten(local.selfip_list_temp)
   //bigip_nics       = concat(aws_network_interface.public.*.id, aws_network_interface.external_private.*.id,aws_network_interface.private.*.id)
   //bigip_nics_map   = concat(data.aws_network_interfaces.bigip_nic.*.private_ip)
