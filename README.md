@@ -25,6 +25,52 @@ This module is supported in the following bigip and terraform version
 | BIG-IP 14.x  | X |
 | BIG-IP 13.x  | X |
 
+## Password Management
+
+By default bigip module will have random password setting to give dynamic password generation
+
+```
+cat terraform-aws-bigip-module/variables.tf
+
+variable aws_secretmanager_auth {
+  description = "Whether to use key vault to pass authentication"
+  type        = bool
+  default     = false
+}
+
+Outputs:
+
+bigip_password = [
+  "xxxxxxxxxxxxxxxxxx",
+]
+
+```
+
+To use AWS secret manager password,we have to enable the variable "aws_secretmanager_auth" to true and supply the secret name to variable "aws_secretmanager_secret_id"
+
+```
+cat terraform-aws-bigip-module/variables.tf
+
+variable aws_secretmanager_auth {
+  description = "Whether to use key vault to pass authentication"
+  type        = bool
+  default     = true
+}
+
+variable aws_secretmanager_secret_id {
+  description = "AWS Secret Manager Secret ID that stores the BIG-IP password"
+  type        = string
+  default     = "tf-aws-bigip-bigip-secret-9759"
+} 
+
+Outputs:
+
+bigip_password = [
+  "xxxxxxxxxxxxxxx",
+]
+
+```
+
 ## Example Usage
 
 We have provided some common deployment [examples](https://github.com/f5devcentral/terraform-aws-bigip-module/tree/master/examples)
