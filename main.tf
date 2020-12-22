@@ -400,13 +400,6 @@ resource "aws_instance" "f5_bigip" {
   user_data = var.custom_user_data != null ? var.custom_user_data : templatefile(
     "${path.module}/f5_onboard.tmpl",
     {
-      DO_URL         = var.DO_URL,
-      AS3_URL        = var.AS3_URL,
-      TS_URL         = var.TS_URL,
-      CFE_URL        = var.CFE_URL,
-      FAST_URL       = var.fastPackageUrl
-      libs_dir       = var.libs_dir,
-      onboard_log    = var.onboard_log,
       bigip_username = var.f5_username
       bigip_password = var.aws_secretmanager_auth ? data.aws_secretsmanager_secret_version.current[0].secret_string : random_string.dynamic_password.result
     }
