@@ -343,6 +343,23 @@ resource "aws_network_interface" "private1" {
   }
 }
 
+
+
+
+data "template_file" "user_data_vm0" {
+  template = "${file("${path.module}/f5_onboard.tmpl")}"
+  vars = {
+     bigip_username = var.f5_username
+      bigip_password = var.aws_secretmanager_auth ? data.aws_secretsmanager_secret_version.current[0].secret_string : random_string.dynamic_password.result
+  }
+}
+
+resource "null_resource" "delay" {
+  provisioner "local-exec" {
+    command = "sleep 30"
+  }
+}
+
 # Deploy BIG-IP
 #
 resource "aws_instance" "f5_bigip" {
@@ -397,14 +414,20 @@ resource "aws_instance" "f5_bigip" {
   }
 
   # build user_data file from template
-  user_data = var.custom_user_data != null ? var.custom_user_data : templatefile(
-    "${path.module}/f5_onboard.tmpl",
-    {
-      bigip_username = var.f5_username
-      bigip_password = var.aws_secretmanager_auth ? data.aws_secretsmanager_secret_version.current[0].secret_string : random_string.dynamic_password.result
-    }
-  )
-  depends_on = [aws_eip.mgmt, aws_network_interface.public, aws_network_interface.private]
+  //user_data = var.custom_user_data != null ? var.custom_user_data : templatefile(
+    //"${path.module}/f5_onboard.tmpl",
+    //{
+     // bigip_username = var.f5_username
+      //bigip_password = var.aws_secretmanager_auth ? data.aws_secretsmanager_secret_version.current[0].secret_string : random_string.dynamic_password.result
+    //}
+  //)
+  user_data = "${data.template_file.user_data_vm0.rendered}"
+ provisioner "local-exec" {
+  //  command = "aws ec2 wait instance-status-ok --instance-ids ${aws_instance.f5_bigip[count.index].id} --region ap-south-1"
+  command = "sleep 300"
+  
+}
+  depends_on = [aws_eip.mgmt, aws_network_interface.public, aws_network_interface.private, null_resource.delay]
 
   tags = {
     Name = format("%s-%d", local.instance_prefix, count.index)
