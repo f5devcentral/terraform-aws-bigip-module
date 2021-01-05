@@ -106,48 +106,46 @@ locals {
   internal_private_security_id = [
     for i in local.internal_private_index : local.bigip_map["internal_securitygroup_ids"][i]
   ]
-  internal_private_ip_primary = [	
-	for private in local.bigip_map["internal_subnet_ids"] :
-	private["private_ip_primary"]
-	if private["public_ip"] == false
+  internal_private_ip_primary = [
+    for private in local.bigip_map["internal_subnet_ids"] :
+    private["private_ip_primary"]
+    if private["public_ip"] == false
   ]
-  external_private_ip_primary = [	
-	for private in local.bigip_map["external_subnet_ids"] :
-	private["private_ip_primary"]
-	if private["public_ip"] == false
+  external_private_ip_primary = [
+    for private in local.bigip_map["external_subnet_ids"] :
+    private["private_ip_primary"]
+    if private["public_ip"] == false
   ]
   external_private_ip_secondary = [
-	for private in local.bigip_map["external_subnet_ids"] :
-	private["private_ip_secondary"]
-	if private["public_ip"] == false
+    for private in local.bigip_map["external_subnet_ids"] :
+    private["private_ip_secondary"]
+    if private["public_ip"] == false
   ]
-  external_public_private_ip_primary = [	
-	for private in local.bigip_map["external_subnet_ids"] :
-	private["private_ip_primary"]
-	if private["public_ip"] == true
+  external_public_private_ip_primary = [
+    for private in local.bigip_map["external_subnet_ids"] :
+    private["private_ip_primary"]
+    if private["public_ip"] == true
   ]
   external_public_private_ip_secondary = [
-	for private in local.bigip_map["external_subnet_ids"] :
-	private["private_ip_secondary"]
-	if private["public_ip"] == true
+    for private in local.bigip_map["external_subnet_ids"] :
+    private["private_ip_secondary"]
+    if private["public_ip"] == true
   ]
-  mgmt_private_ip_primary = [	
-	for private in local.bigip_map["mgmt_subnet_ids"] :
-	private["private_ip_primary"]
-	if private["public_ip"] == false
+  mgmt_private_ip_primary = [
+    for private in local.bigip_map["mgmt_subnet_ids"] :
+    private["private_ip_primary"]
+    if private["public_ip"] == false
   ]
-  mgmt_public_private_ip_primary = [	
-	for private in local.bigip_map["mgmt_subnet_ids"] :
-	private["private_ip_primary"]
-	if private["public_ip"] == true
+  mgmt_public_private_ip_primary = [
+    for private in local.bigip_map["mgmt_subnet_ids"] :
+    private["private_ip_primary"]
+    if private["public_ip"] == true
   ]
-	
-
 
   total_nics       = length(concat(local.mgmt_public_subnet_id, local.mgmt_private_subnet_id, local.external_public_subnet_id, local.external_private_subnet_id, local.internal_public_subnet_id, local.internal_private_subnet_id))
   vlan_list        = concat(local.external_public_subnet_id, local.external_private_subnet_id, local.internal_public_subnet_id, local.internal_private_subnet_id)
   selfip_list_temp = concat(aws_network_interface.public.*.private_ip, aws_network_interface.external_private.*.private_ip, aws_network_interface.private.*.private_ip, aws_network_interface.public1.*.private_ip, aws_network_interface.external_private1.*.private_ip, aws_network_interface.private1.*.private_ip)
-  ext_interfaces   = concat(aws_network_interface.public.*.id,aws_network_interface.public1.*.id,aws_network_interface.external_private.*.id,aws_network_interface.external_private1.*.id)
+  ext_interfaces   = concat(aws_network_interface.public.*.id, aws_network_interface.public1.*.id, aws_network_interface.external_private.*.id, aws_network_interface.external_private1.*.id)
   selfip_list      = flatten(local.selfip_list_temp)
   //bigip_nics       = concat(aws_network_interface.public.*.id, aws_network_interface.external_private.*.id,aws_network_interface.private.*.id)
   //bigip_nics_map   = concat(data.aws_network_interfaces.bigip_nic.*.private_ip)
@@ -206,7 +204,7 @@ data "aws_ami" "f5_ami" {
 #This resource is for static  primary and secondary private ips 
 
 resource "aws_network_interface" "mgmt" {
-  count           = "${length(compact(local.mgmt_public_private_ip_primary)) > 0 ? length(local.bigip_map["mgmt_subnet_ids"]) : 0}" 
+  count           = "${length(compact(local.mgmt_public_private_ip_primary)) > 0 ? length(local.bigip_map["mgmt_subnet_ids"]) : 0}"
   subnet_id       = local.bigip_map["mgmt_subnet_ids"][count.index]["subnet_id"]
   private_ips     = [local.mgmt_public_private_ip_primary[count.index]]
   security_groups = var.mgmt_securitygroup_ids
@@ -220,11 +218,11 @@ resource "aws_network_interface" "mgmt" {
 #This resource is for dynamic  primary and secondary private ips  
 
 resource "aws_network_interface" "mgmt1" {
-  count           = "${length(compact(local.mgmt_public_private_ip_primary)) > 0 ? 0 : length(local.bigip_map["mgmt_subnet_ids"])}"
-  subnet_id       = local.bigip_map["mgmt_subnet_ids"][count.index]["subnet_id"]
-  security_groups = var.mgmt_securitygroup_ids
+  count             = "${length(compact(local.mgmt_public_private_ip_primary)) > 0 ? 0 : length(local.bigip_map["mgmt_subnet_ids"])}"
+  subnet_id         = local.bigip_map["mgmt_subnet_ids"][count.index]["subnet_id"]
+  security_groups   = var.mgmt_securitygroup_ids
   private_ips_count = 0
-  tags = { 
+  tags = {
     Name   = format("%s-%d", "BIGIP-Managemt-Interface", count.index)
     Prefix = format("%s", local.instance_prefix)
   }
@@ -235,7 +233,7 @@ resource "aws_network_interface" "mgmt1" {
 # add an elastic IP to the BIG-IP management interface
 #
 resource "aws_eip" "mgmt" {
-  count             = length(local.bigip_map["mgmt_subnet_ids"])
+  count = length(local.bigip_map["mgmt_subnet_ids"])
   #network_interface = aws_network_interface.mgmt[count.index].id
   network_interface = "${length(compact(local.mgmt_public_private_ip_primary)) > 0 ? aws_network_interface.mgmt[count.index].id : aws_network_interface.mgmt1[count.index].id}"
   vpc               = true
@@ -245,7 +243,7 @@ resource "aws_eip" "mgmt" {
 # add an elastic IP to the BIG-IP External Public interface
 #
 resource "aws_eip" "ext-pub" {
-  count             = length(local.external_public_subnet_id)
+  count = length(local.external_public_subnet_id)
   #network_interface = aws_network_interface.public[count.index].id
   network_interface = "${length(compact(local.external_public_private_ip_primary)) > 0 ? aws_network_interface.public[count.index].id : aws_network_interface.public1[count.index].id}"
   vpc               = true
@@ -258,12 +256,12 @@ resource "aws_eip" "ext-pub" {
 #This resource is for static  primary and secondary private ips
 
 resource "aws_network_interface" "public" {
-  count             = "${length(compact(local.external_public_private_ip_primary)) > 0 ? length(local.external_public_subnet_id) : 0}"
- #count             = length(local.external_public_subnet_id)
-  subnet_id         = local.external_public_subnet_id[count.index]
-  security_groups   = var.external_securitygroup_ids
+  count = "${length(compact(local.external_public_private_ip_primary)) > 0 ? length(local.external_public_subnet_id) : 0}"
+  #count             = length(local.external_public_subnet_id)
+  subnet_id       = local.external_public_subnet_id[count.index]
+  security_groups = var.external_securitygroup_ids
   private_ips     = [local.external_public_private_ip_primary[count.index], local.external_public_private_ip_secondary[count.index]]
- # private_ips_count = 1
+  # private_ips_count = 1
   tags = {
     Name   = format("%s-%d", "BIGIP-External-Public-Interface", count.index)
     Prefix = format("%s", local.instance_prefix)
@@ -273,7 +271,7 @@ resource "aws_network_interface" "public" {
 #This resource is for dynamic  primary and secondary private ips
 
 resource "aws_network_interface" "public1" {
-  count             = "${length(compact(local.external_public_private_ip_primary)) > 0 ? 0 : length(local.external_public_subnet_id)}"
+  count = "${length(compact(local.external_public_private_ip_primary)) > 0 ? 0 : length(local.external_public_subnet_id)}"
   #count             = length(local.external_public_subnet_id)
   subnet_id         = local.external_public_subnet_id[count.index]
   security_groups   = var.external_securitygroup_ids
@@ -289,12 +287,12 @@ resource "aws_network_interface" "public1" {
 #This resource is for static  primary and secondary private ips
 
 resource "aws_network_interface" "external_private" {
-  count           = "${length(compact(local.external_private_ip_primary)) > 0 ? length(local.external_private_subnet_id) : 0}"
- # count             = length(local.external_private_subnet_id)
-  subnet_id         = local.external_private_subnet_id[count.index]
-  security_groups   = var.external_securitygroup_ids
+  count = "${length(compact(local.external_private_ip_primary)) > 0 ? length(local.external_private_subnet_id) : 0}"
+  # count             = length(local.external_private_subnet_id)
+  subnet_id       = local.external_private_subnet_id[count.index]
+  security_groups = var.external_securitygroup_ids
   private_ips     = [local.external_private_ip_primary[count.index], local.external_private_ip_secondary[count.index]]
-#  private_ips_count = 1
+  #  private_ips_count = 1
   tags = {
     Name   = format("%s-%d", "BIGIP-External-Private-Interface", count.index)
     Prefix = format("%s", local.instance_prefix)
@@ -304,7 +302,7 @@ resource "aws_network_interface" "external_private" {
 #This resource is for dynamic  primary and secondary private ips
 
 resource "aws_network_interface" "external_private1" {
-  count           = "${length(compact(local.external_private_ip_primary)) > 0 ? 0 : length(local.external_private_ip_primary)}"
+  count = "${length(compact(local.external_private_ip_primary)) > 0 ? 0 : length(local.external_private_ip_primary)}"
   #count             = length(local.external_private_subnet_id)
   subnet_id         = local.external_private_subnet_id[count.index]
   security_groups   = var.external_securitygroup_ids
@@ -333,9 +331,9 @@ resource "aws_network_interface" "private" {
 #This resource is for dynamic  primary and secondary private ips
 
 resource "aws_network_interface" "private1" {
-  count           = "${length(compact(local.internal_private_ip_primary)) > 0 ? 0 : length(local.internal_private_subnet_id)}"
-  subnet_id       = local.internal_private_subnet_id[count.index]
-  security_groups = var.internal_securitygroup_ids
+  count             = "${length(compact(local.internal_private_ip_primary)) > 0 ? 0 : length(local.internal_private_subnet_id)}"
+  subnet_id         = local.internal_private_subnet_id[count.index]
+  security_groups   = var.internal_securitygroup_ids
   private_ips_count = 0
   tags = {
     Name   = format("%s-%d", "BIGIP-Internal-Interface", count.index)
@@ -343,14 +341,11 @@ resource "aws_network_interface" "private1" {
   }
 }
 
-
-
-
 data "template_file" "user_data_vm0" {
   template = "${file("${path.module}/f5_onboard.tmpl")}"
   vars = {
-     bigip_username = var.f5_username
-      bigip_password = var.aws_secretmanager_auth ? data.aws_secretsmanager_secret_version.current[0].secret_string : random_string.dynamic_password.result
+    bigip_username = var.f5_username
+    bigip_password = var.aws_secretmanager_auth ? data.aws_secretsmanager_secret_version.current[0].secret_string : random_string.dynamic_password.result
   }
 }
 
@@ -367,7 +362,8 @@ resource "aws_instance" "f5_bigip" {
   count         = var.f5_instance_count
   instance_type = var.ec2_instance_type
   ami           = data.aws_ami.f5_ami.id
-  key_name      = var.ec2_key_name
+  //ami           = "ami-0fb163d2f818ea5da"
+  key_name = var.ec2_key_name
 
   root_block_device {
     delete_on_termination = true
@@ -393,7 +389,7 @@ resource "aws_instance" "f5_bigip" {
       device_index         = 1 + index(tolist(toset(local.ext_interfaces)), network_interface.value)
     }
   }
-  
+
   # set the private interface only if an interface is defined
   dynamic "network_interface" {
     for_each = length(aws_network_interface.private) > count.index ? toset([aws_network_interface.private[count.index].id]) : toset([])
@@ -403,7 +399,7 @@ resource "aws_instance" "f5_bigip" {
       device_index         = (length(local.ext_interfaces) + 1) + index(tolist(toset([aws_network_interface.private[count.index].id])), network_interface.value)
     }
   }
-  
+
   dynamic "network_interface" {
     for_each = length(aws_network_interface.private1) > count.index ? toset([aws_network_interface.private1[count.index].id]) : toset([])
 
@@ -415,23 +411,22 @@ resource "aws_instance" "f5_bigip" {
 
   # build user_data file from template
   //user_data = var.custom_user_data != null ? var.custom_user_data : templatefile(
-    //"${path.module}/f5_onboard.tmpl",
-    //{
-     // bigip_username = var.f5_username
-      //bigip_password = var.aws_secretmanager_auth ? data.aws_secretsmanager_secret_version.current[0].secret_string : random_string.dynamic_password.result
-    //}
+  //"${path.module}/f5_onboard.tmpl",
+  //{
+  // bigip_username = var.f5_username
+  //bigip_password = var.aws_secretmanager_auth ? data.aws_secretsmanager_secret_version.current[0].secret_string : random_string.dynamic_password.result
+  //}
   //)
-  user_data = "${data.template_file.user_data_vm0.rendered}"
- provisioner "local-exec" {
-  //  command = "aws ec2 wait instance-status-ok --instance-ids ${aws_instance.f5_bigip[count.index].id} --region ap-south-1"
-  command = "sleep 300"
-  
-}
-  depends_on = [aws_eip.mgmt, aws_network_interface.public, aws_network_interface.private, null_resource.delay]
-
+  iam_instance_profile = var.aws_iam_instance_profile
+  user_data            = "${data.template_file.user_data_vm0.rendered}"
+  provisioner "local-exec" {
+    //  command = "aws ec2 wait instance-status-ok --instance-ids ${aws_instance.f5_bigip[count.index].id} --region ap-south-1"
+    command = "sleep 300"
+  }
   tags = {
     Name = format("%s-%d", local.instance_prefix, count.index)
   }
+  depends_on = [aws_eip.mgmt, aws_network_interface.public, aws_network_interface.private, null_resource.delay]
 }
 
 data template_file clustermemberDO1 {
