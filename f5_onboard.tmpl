@@ -12,16 +12,22 @@ exec 1>&-
 exec 1>$npipe
 exec 2>&1
 
-# create user
-tmsh create auth user ${bigip_username} password ${bigip_password} shell tmsh partition-access replace-all-with { all-partitions { role admin } }
+# # create user
+# tmsh create auth user ${bigip_username} password ${bigip_password} shell tmsh partition-access replace-all-with { all-partitions { role admin } }
 
 # save config
 tmsh save sys config
 
 mkdir -p /config/cloud
-cat << 'EOF' > /config/cloud/runtime-init-conf.yaml
+a=false
+if ${aws_secretmanager_auth}
+then
+   cat << 'EOF' > /config/cloud/runtime-init-conf.yaml
 ---
 runtime_parameters:
+  - name: USER_NAME
+    type: static
+    value: ${bigip_username}
   - name: ADMIN_PASS
     type: secret
     secretProvider:
@@ -45,16 +51,51 @@ extension_services:
   service_operations:
     - extensionType: do
       type: url
-      value: https://raw.githubusercontent.com/F5Networks/f5-bigip-runtime-init/main/examples/declarations/do_w_admin.json
+      value: https://raw.githubusercontent.com/f5devcentral/terraform-aws-bigip-module/dev_runtimeinit/config/onboard_do.json
     - extensionType: as3
       type: url
-      value: https://raw.githubusercontent.com/F5Networks/f5-bigip-runtime-init/main/examples/declarations/as3.json
+      value: https://raw.githubusercontent.com/f5devcentral/terraform-aws-bigip-module/dev_runtimeinit/config/as3.json
 post_onboard_enabled: []
 
 EOF
 
-# # Download
+else
+   cat << 'EOF' > /config/cloud/runtime-init-conf.yaml
+---
+runtime_parameters:
+  - name: USER_NAME
+    type: static
+    value: ${bigip_username}
+  - name: ADMIN_PASS
+    type: static
+    value: ${bigip_password}
+pre_onboard_enabled:
+  - name: provision_rest
+    type: inline
+    commands:
+      - /usr/bin/setdb provision.extramb 500
+      - /usr/bin/setdb restjavad.useextramb true
+extension_packages:
+  install_operations:
+    - extensionType: do
+      extensionVersion: 1.16.0
+    - extensionType: as3
+      extensionVersion: 3.23.0
+extension_services:
+  service_operations:
+    - extensionType: do
+      type: url
+      value: https://raw.githubusercontent.com/f5devcentral/terraform-aws-bigip-module/dev_runtimeinit/config/onboard_do.json
+    - extensionType: as3
+      type: url
+      value: https://raw.githubusercontent.com/f5devcentral/terraform-aws-bigip-module/dev_runtimeinit/config/as3.json
+post_onboard_enabled: []
 
+EOF
+
+fi
+
+# # Download
 PACKAGE_URL='https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.1.0/dist/f5-bigip-runtime-init-1.1.0-1.gz.run'
 for i in {1..30}; do
     curl -fv --retry 1 --connect-timeout 5 -L $PACKAGE_URL -o "/var/config/rest/downloads/f5-bigip-runtime-init-1.1.0-1.gz.run" && break || sleep 10

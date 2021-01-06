@@ -344,8 +344,9 @@ resource "aws_network_interface" "private1" {
 data "template_file" "user_data_vm0" {
   template = "${file("${path.module}/f5_onboard.tmpl")}"
   vars = {
-    bigip_username = var.f5_username
-    bigip_password = var.aws_secretmanager_auth ? data.aws_secretsmanager_secret_version.current[0].secret_id : random_string.dynamic_password.result
+    bigip_username         = var.f5_username
+    aws_secretmanager_auth = var.aws_secretmanager_auth
+    bigip_password         = var.aws_secretmanager_auth ? data.aws_secretsmanager_secret_version.current[0].secret_id : random_string.dynamic_password.result
   }
 }
 
