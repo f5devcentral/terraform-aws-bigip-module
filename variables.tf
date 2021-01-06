@@ -45,7 +45,7 @@ variable mgmt_eip {
 variable aws_secretmanager_auth {
   description = "Whether to use key vault to pass authentication"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable aws_secretmanager_secret_id {
