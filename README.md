@@ -229,6 +229,7 @@ These variables have default values and don't have to be set to use this module.
 | mgmt_eip 	| Enable an Elastic IP address on the management interface 	| bool 	| TRUE 	|
 | aws_secretmanager_auth 	| Whether to use key vault to pass authentication 	| bool 	| FALSE 	|
 | aws_secretmanager_secret_id 	| AWS Secret Manager Secret ID that stores the BIG-IP password 	| string 	|  	|
+| aws_iam_instance_profile 	| AWS IAM instance profile that can be associate for BIGIP with required permissions 	| string 	|  	|
 | DO_URL | URL to download the BIG-IP Declarative Onboarding module | `string` | latest | 
 | AS3_URL | URL to download the BIG-IP Application Service Extension 3 (AS3) module | `string` | latest | 
 | TS_URL | URL to download the BIG-IP Telemetry Streaming module | `string` | latest | 

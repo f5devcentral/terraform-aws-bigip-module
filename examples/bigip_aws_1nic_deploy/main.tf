@@ -20,6 +20,77 @@ resource random_string password {
   special     = false
 }
 
+resource "aws_iam_role" "main" {
+  name               = format("%s-iam-role-%s", var.prefix, random_id.id.hex)
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "BigIpPolicy" {
+  //name = "aws-iam-role-policy-${module.utils.env_prefix}"
+  role   = aws_iam_role.main.id
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+        "Action": [
+            "ec2:DescribeInstances",
+            "ec2:DescribeInstanceStatus",
+            "ec2:DescribeAddresses",
+            "ec2:AssociateAddress",
+            "ec2:DisassociateAddress",
+            "ec2:DescribeNetworkInterfaces",
+            "ec2:DescribeNetworkInterfaceAttribute",
+            "ec2:DescribeRouteTables",
+            "ec2:ReplaceRoute",
+            "ec2:CreateRoute",
+            "ec2:assignprivateipaddresses",
+            "sts:AssumeRole",
+            "s3:ListAllMyBuckets"
+        ],
+        "Resource": [
+            "*"
+        ],
+        "Effect": "Allow"
+    },
+    {
+        "Effect": "Allow",
+        "Action": [
+            "secretsmanager:GetResourcePolicy",
+            "secretsmanager:GetSecretValue",
+            "secretsmanager:PutSecretValue",
+            "secretsmanager:DescribeSecret",
+            "secretsmanager:ListSecretVersionIds",
+            "secretsmanager:UpdateSecretVersionStage"
+        ],
+        "Resource": [
+            "arn:aws:secretsmanager:${var.region}:${module.vpc.vpc_owner_id}:secret:*"
+        ]
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_instance_profile" "instance_profile" {
+  name = format("%s-iam-profile-%s", var.prefix, random_id.id.hex)
+  role = aws_iam_role.main.id
+}
+
 #
 # Create Secret Store and Store BIG-IP Password
 #
@@ -113,13 +184,14 @@ resource "aws_key_pair" "generated_key" {
 # Create BIG-IP
 #
 module bigip {
-  source       = "../../"
-  count        = var.instance_count
-  prefix       = format("%s-1nic", var.prefix)
-  ec2_key_name = aws_key_pair.generated_key.key_name
-  #  aws_secretmanager_secret_id = aws_secretsmanager_secret.bigip.id
-  mgmt_subnet_ids        = [{ "subnet_id" = aws_subnet.mgmt.id, "public_ip" = true,"private_ip_primary" = ""}]
-  mgmt_securitygroup_ids = [module.mgmt-network-security-group.this_security_group_id]
+  source                      = "../../"
+  count                       = var.instance_count
+  prefix                      = format("%s-1nic", var.prefix)
+  ec2_key_name                = aws_key_pair.generated_key.key_name
+  aws_secretmanager_secret_id = aws_secretsmanager_secret.bigip.id
+  aws_iam_instance_profile    = aws_iam_instance_profile.instance_profile.name
+  mgmt_subnet_ids             = [{ "subnet_id" = aws_subnet.mgmt.id, "public_ip" = true, "private_ip_primary" = "" }]
+  mgmt_securitygroup_ids      = [module.mgmt-network-security-group.this_security_group_id]
 }
 
 resource "null_resource" "clusterDO" {

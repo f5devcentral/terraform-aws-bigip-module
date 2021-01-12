@@ -12,8 +12,9 @@ variable f5_username {
 variable f5_ami_search_name {
   description = "BIG-IP AMI name to search for"
   type        = string
-  default     = "F5 Networks BIGIP-14.* PAYG - Best 200Mbps*"
-  //default = "F5 BIGIP-14.1.2.6* PAYG - Best 200Mbps*"
+  //default     = "F5 BIGIP-*"
+  default = "F5 BIGIP-15.*"
+  #default = "F5 Networks BIGIP-14.0.1-0.0.14 PAYG - Best 1Gbps - 20190817094829-929ca0d8-c2d7-4068-8f9a-eb75a677afed-ami-047292a9177e2e328.4"
 }
 
 variable f5_instance_count {
@@ -26,6 +27,7 @@ variable ec2_instance_type {
   description = "AWS EC2 instance type"
   type        = string
   default     = "m5.xlarge"
+  #default     = "c4.xlarge"
 }
 
 variable ec2_key_name {
@@ -52,11 +54,17 @@ variable aws_secretmanager_secret_id {
   default     = null
 }
 
+variable aws_iam_instance_profile {
+  description = "aws_iam_instance_profile"
+  type        = string
+  default     = null
+}
+
 variable mgmt_subnet_ids {
   description = "The subnet id of the virtual network where the virtual machines will reside."
   type = list(object({
-    subnet_id = string
-    public_ip = bool
+    subnet_id          = string
+    public_ip          = bool
     private_ip_primary = string
   }))
   default = [{ "subnet_id" = null, "public_ip" = null, "private_ip_primary" = null }]
@@ -65,9 +73,9 @@ variable mgmt_subnet_ids {
 variable external_subnet_ids {
   description = "The subnet id of the virtual network where the virtual machines will reside."
   type = list(object({
-    subnet_id = string
-    public_ip = bool
-    private_ip_primary = string
+    subnet_id            = string
+    public_ip            = bool
+    private_ip_primary   = string
     private_ip_secondary = string
   }))
   default = [{ "subnet_id" = null, "public_ip" = null, "private_ip_primary" = null, "private_ip_secondary" = null }]
@@ -76,8 +84,8 @@ variable external_subnet_ids {
 variable internal_subnet_ids {
   description = "The subnet id of the virtual network where the virtual machines will reside."
   type = list(object({
-    subnet_id = string
-    public_ip = bool
+    subnet_id          = string
+    public_ip          = bool
     private_ip_primary = string
   }))
   default = [{ "subnet_id" = null, "public_ip" = null, "private_ip_primary" = null }]
