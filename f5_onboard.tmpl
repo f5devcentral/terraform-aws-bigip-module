@@ -19,7 +19,7 @@ exec 2>&1
 tmsh save sys config
 
 mkdir -p /config/cloud
-a=false
+
 if ${aws_secretmanager_auth}
 then
    cat << 'EOF' > /config/cloud/runtime-init-conf.yaml
