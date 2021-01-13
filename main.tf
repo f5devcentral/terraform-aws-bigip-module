@@ -197,12 +197,10 @@ data "aws_ami" "f5_ami" {
   }
 }
 
-
 #
 # Create Management Network Interfaces
 #
 #This resource is for static  primary and secondary private ips 
-
 resource "aws_network_interface" "mgmt" {
   count           = "${length(compact(local.mgmt_public_private_ip_primary)) > 0 ? length(local.bigip_map["mgmt_subnet_ids"]) : 0}"
   subnet_id       = local.bigip_map["mgmt_subnet_ids"][count.index]["subnet_id"]
@@ -212,11 +210,9 @@ resource "aws_network_interface" "mgmt" {
     Name   = format("%s-%d", "BIGIP-Managemt-Interface", count.index)
     Prefix = format("%s", local.instance_prefix)
   }
-
 }
 
 #This resource is for dynamic  primary and secondary private ips  
-
 resource "aws_network_interface" "mgmt1" {
   count             = "${length(compact(local.mgmt_public_private_ip_primary)) > 0 ? 0 : length(local.bigip_map["mgmt_subnet_ids"])}"
   subnet_id         = local.bigip_map["mgmt_subnet_ids"][count.index]["subnet_id"]
@@ -226,7 +222,6 @@ resource "aws_network_interface" "mgmt1" {
     Name   = format("%s-%d", "BIGIP-Managemt-Interface", count.index)
     Prefix = format("%s", local.instance_prefix)
   }
-
 }
 
 #
@@ -281,6 +276,7 @@ resource "aws_network_interface" "public1" {
     Prefix = format("%s", local.instance_prefix)
   }
 }
+
 #
 # Create Private External Network Interfaces
 #
@@ -409,17 +405,8 @@ resource "aws_instance" "f5_bigip" {
       device_index         = (length(local.ext_interfaces) + 1) + index(tolist(toset([aws_network_interface.private1[count.index].id])), network_interface.value)
     }
   }
-
-  # build user_data file from template
-  //user_data = var.custom_user_data != null ? var.custom_user_data : templatefile(
-  //"${path.module}/f5_onboard.tmpl",
-  //{
-  // bigip_username = var.f5_username
-  //bigip_password = var.aws_secretmanager_auth ? data.aws_secretsmanager_secret_version.current[0].secret_string : random_string.dynamic_password.result
-  //}
-  //)
   iam_instance_profile = var.aws_iam_instance_profile
-  user_data            = "${data.template_file.user_data_vm0.rendered}"
+  user_data            = data.template_file.user_data_vm0.rendered
   provisioner "local-exec" {
     //  command = "aws ec2 wait instance-status-ok --instance-ids ${aws_instance.f5_bigip[count.index].id} --region ap-south-1"
     command = "sleep 300"
@@ -472,9 +459,3 @@ data template_file clustermemberDO3 {
   }
   depends_on = [aws_network_interface.public, aws_network_interface.private]
 }
-
-// data aws_network_interface bigip_nics {
-//   //for_each   = length(local.ext_interfaces) > 1 ? toset(local.ext_interfaces) : toset([])
-//   count = length(local.bigip_nics)
-//   id    = local.bigip_nics[count.index]
-// }
