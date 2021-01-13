@@ -12,7 +12,7 @@
     "myDns": {
       "class": "DNS",
       "nameServers": [
-        "${name_servers}"
+        ${name_servers}
       ],
       "search": [
         "f5.com"
@@ -21,7 +21,7 @@
     "myNtp": {
       "class": "NTP",
       "servers": [
-        "${ntp_servers}"
+        ${ntp_servers}
       ],
       "timezone": "UTC"
     },

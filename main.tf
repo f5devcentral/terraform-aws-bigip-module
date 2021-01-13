@@ -422,9 +422,9 @@ data template_file clustermemberDO1 {
   template = "${file("${path.module}/onboard_do_1nic.tpl")}"
   vars = {
     hostname      = aws_eip.mgmt[0].public_dns
-    name_servers  = join(",", formatlist("\"%s\"", ["168.63.129.16"]))
+    name_servers  = join(",", formatlist("\"%s\"", ["169.254.169.253"]))
     search_domain = "f5.com"
-    ntp_servers   = join(",", formatlist("\"%s\"", ["0.pool.ntp.org", "1.pool.ntp.org", "2.pool.ntp.org"]))
+    ntp_servers   = join(",", formatlist("\"%s\"", ["169.254.169.123"]))
   }
 }
 
@@ -433,9 +433,9 @@ data template_file clustermemberDO2 {
   template = file("${path.module}/onboard_do_2nic.tpl")
   vars = {
     hostname      = aws_eip.mgmt[0].public_dns
-    name_servers  = join(",", formatlist("\"%s\"", ["168.63.129.16"]))
+    name_servers  = join(",", formatlist("\"%s\"", ["169.254.169.253"]))
     search_domain = "f5.com"
-    ntp_servers   = join(",", formatlist("\"%s\"", ["0.pool.ntp.org", "1.pool.ntp.org", "2.pool.ntp.org"]))
+    ntp_servers   = join(",", formatlist("\"%s\"", ["169.254.169.123"]))
     vlan-name     = element(split("/", local.vlan_list[0]), length(split("/", local.vlan_list[0])) - 1)
     self-ip       = local.selfip_list[0]
     gateway       = cidrhost(format("%s/24", local.selfip_list[0]), 1)
@@ -448,9 +448,9 @@ data template_file clustermemberDO3 {
   template = file("${path.module}/onboard_do_3nic.tpl")
   vars = {
     hostname      = aws_eip.mgmt[0].public_dns
-    name_servers  = join(",", formatlist("\"%s\"", ["168.63.129.16"]))
+    name_servers  = join(",", formatlist("\"%s\"", ["169.254.169.253"]))
     search_domain = "f5.com"
-    ntp_servers   = join(",", formatlist("\"%s\"", ["0.pool.ntp.org", "1.pool.ntp.org", "2.pool.ntp.org"]))
+    ntp_servers   = join(",", formatlist("\"%s\"", ["169.254.169.123"]))
     vlan-name1    = element(split("/", local.vlan_list[0]), length(split("/", local.vlan_list[0])) - 1)
     self-ip1      = local.selfip_list[0]
     gateway       = cidrhost(format("%s/24", local.selfip_list[0]), 1)
