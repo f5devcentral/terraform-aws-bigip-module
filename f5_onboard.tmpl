@@ -44,9 +44,11 @@ pre_onboard_enabled:
 extension_packages:
   install_operations:
     - extensionType: do
-      extensionVersion: 1.16.0
+      extensionVersion: ${DO_VER}
+      extensionUrl: ${DO_URL}
     - extensionType: as3
-      extensionVersion: 3.23.0
+      extensionVersion: ${AS3_VER}
+      extensionUrl: ${AS3_URL}
 extension_services:
   service_operations:
     - extensionType: do
@@ -78,17 +80,19 @@ pre_onboard_enabled:
 extension_packages:
   install_operations:
     - extensionType: do
-      extensionVersion: 1.16.0
+      extensionVersion: ${DO_VER}
+      extensionUrl: ${DO_URL}
     - extensionType: as3
-      extensionVersion: 3.23.0
+      extensionVersion: ${AS3_VER}
+      extensionUrl: ${AS3_URL}
 extension_services:
   service_operations:
     - extensionType: do
       type: url
-      value: https://raw.githubusercontent.com/f5devcentral/terraform-aws-bigip-module/dev_runtimeinit/config/onboard_do.json
+      value: https://raw.githubusercontent.com/f5devcentral/terraform-aws-bigip-module/master/config/onboard_do.json
     - extensionType: as3
       type: url
-      value: https://raw.githubusercontent.com/f5devcentral/terraform-aws-bigip-module/dev_runtimeinit/config/as3.json
+      value: https://raw.githubusercontent.com/f5devcentral/terraform-aws-bigip-module/master/config/as3.json
 post_onboard_enabled: []
 
 EOF
