@@ -20,14 +20,17 @@ tmsh save sys config
 
 mkdir -p /config/cloud
 
-if ${aws_secretmanager_auth}
-then
-   cat << 'EOF' > /config/cloud/runtime-init-conf.yaml
+cat << 'EOF' > /config/cloud/runtime-init-conf.yaml
 ---
 runtime_parameters:
   - name: USER_NAME
     type: static
     value: ${bigip_username}
+EOF
+
+if ${aws_secretmanager_auth}
+then
+   cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
   - name: ADMIN_PASS
     type: secret
     secretProvider:
@@ -35,42 +38,17 @@ runtime_parameters:
       type: SecretsManager
       version: AWSCURRENT
       secretId: ${bigip_password}
-pre_onboard_enabled:
-  - name: provision_rest
-    type: inline
-    commands:
-      - /usr/bin/setdb provision.extramb 500
-      - /usr/bin/setdb restjavad.useextramb true
-extension_packages:
-  install_operations:
-    - extensionType: do
-      extensionVersion: ${DO_VER}
-      extensionUrl: ${DO_URL}
-    - extensionType: as3
-      extensionVersion: ${AS3_VER}
-      extensionUrl: ${AS3_URL}
-extension_services:
-  service_operations:
-    - extensionType: do
-      type: url
-      value: https://raw.githubusercontent.com/f5devcentral/terraform-aws-bigip-module/master/config/onboard_do.json
-    - extensionType: as3
-      type: url
-      value: https://raw.githubusercontent.com/f5devcentral/terraform-aws-bigip-module/master/config/as3.json
-post_onboard_enabled: []
-
 EOF
-
 else
-   cat << 'EOF' > /config/cloud/runtime-init-conf.yaml
----
-runtime_parameters:
-  - name: USER_NAME
-    type: static
-    value: ${bigip_username}
+   cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
   - name: ADMIN_PASS
     type: static
     value: ${bigip_password}
+EOF
+fi
+
+# Add remaining runtime_parameters:
+cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
 pre_onboard_enabled:
   - name: provision_rest
     type: inline
@@ -90,14 +68,8 @@ extension_services:
     - extensionType: do
       type: url
       value: https://raw.githubusercontent.com/f5devcentral/terraform-aws-bigip-module/master/config/onboard_do.json
-    - extensionType: as3
-      type: url
-      value: https://raw.githubusercontent.com/f5devcentral/terraform-aws-bigip-module/master/config/as3.json
 post_onboard_enabled: []
-
 EOF
-
-fi
 
 # # Download
 PACKAGE_URL='https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.1.0/dist/f5-bigip-runtime-init-1.1.0-1.gz.run'
