@@ -349,7 +349,7 @@ data "template_file" "user_data_vm0" {
     AS3_VER                = split("/", var.AS3_URL)[7]
     TS_URL                 = var.TS_URL,
     CFE_URL                = var.CFE_URL,
-    FAST_URL               = var.fastPackageUrl
+    FAST_URL               = var.FAST_URL
   }
 }
 

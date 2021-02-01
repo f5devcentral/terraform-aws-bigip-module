@@ -233,7 +233,7 @@ These variables have default values and don't have to be set to use this module.
 | DO_URL | URL to download the BIG-IP Declarative Onboarding module | `string` | latest | 
 | AS3_URL | URL to download the BIG-IP Application Service Extension 3 (AS3) module | `string` | latest | 
 | TS_URL | URL to download the BIG-IP Telemetry Streaming module | `string` | latest | 
-| fastPackageUrl | URL to download the BIG-IP FAST module | `string` | latest | 
+| FAST_URL | URL to download the BIG-IP FAST module | `string` | latest | 
 | CFE_URL | URL to download the BIG-IP Cloud Failover Extension module | `string` | latest |
 | libs\_dir | Directory on the BIG-IP to download the A&O Toolchain into | `string` | /config/cloud/aws/node_modules |
 | onboard\_log | Directory on the BIG-IP to store the cloud-init logs | `string` | /var/log/startup-script.log |

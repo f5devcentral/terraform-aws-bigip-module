@@ -141,7 +141,7 @@ variable CFE_URL {
 
 ## Please check and update the latest FAST URL from https://github.com/F5Networks/f5-appsvcs-templates/releases/latest 
 # always point to a specific version in order to avoid inadvertent configuration inconsistency
-variable fastPackageUrl {
+variable FAST_URL {
   description = "URL to download the BIG-IP FAST module"
   type        = string
   default     = "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.4.0/f5-appsvcs-templates-1.4.0-1.noarch.rpm"
