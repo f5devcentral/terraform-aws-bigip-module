@@ -164,6 +164,7 @@ resource random_id module_id {
 # Create random password for BIG-IP
 #
 resource random_string dynamic_password {
+  //count = var.f5_password == null ? 1 : 0
   length      = 16
   min_upper   = 1
   min_lower   = 1
@@ -342,12 +343,14 @@ data "template_file" "user_data_vm0" {
   vars = {
     bigip_username         = var.f5_username
     aws_secretmanager_auth = var.aws_secretmanager_auth
-    bigip_password         = var.aws_secretmanager_auth ? data.aws_secretsmanager_secret_version.current[0].secret_id : random_string.dynamic_password.result
+    bigip_password         = (var.f5_password == "") ? (var.aws_secretmanager_auth ? data.aws_secretsmanager_secret_version.current[0].secret_id : random_string.dynamic_password.result) : var.f5_password
     DO_URL                 = var.DO_URL,
     DO_VER                 = split("/", var.DO_URL)[7]
     AS3_URL                = var.AS3_URL,
     AS3_VER                = split("/", var.AS3_URL)[7]
+    TS_VER                 = split("/", var.TS_URL)[7]
     TS_URL                 = var.TS_URL,
+    CFE_VER                = split("/", var.CFE_URL)[7]
     CFE_URL                = var.CFE_URL,
     FAST_URL               = var.FAST_URL
   }

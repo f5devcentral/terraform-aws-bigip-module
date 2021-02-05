@@ -9,6 +9,11 @@ variable f5_username {
   default     = "bigipuser"
 }
 
+variable f5_password {
+  description = "The admin username of the F5 Bigip that will be deployed"
+  default     = ""
+}
+
 variable f5_ami_search_name {
   description = "BIG-IP AMI name to search for"
   type        = string

@@ -64,9 +64,11 @@ extension_packages:
       extensionVersion: ${AS3_VER}
       extensionUrl: ${AS3_URL}
     - extensionType: ts
-      extensionVersion: 1.15.0
+      extensionVersion: ${TS_VER}
+      extensionUrl: ${TS_URL}
     - extensionType: cf
-      extensionVersion: 1.6.1
+      extensionVersion: ${CFE_VER}
+      extensionUrl: ${CFE_URL}
 extension_services:
   service_operations:
     - extensionType: do
@@ -83,4 +85,5 @@ done
 # Install
 bash /var/config/rest/downloads/f5-bigip-runtime-init-1.1.0-1.gz.run -- '--cloud aws'
 # Run
+# export F5_BIGIP_RUNTIME_INIT_LOG_LEVEL=silly
 f5-bigip-runtime-init --config-file /config/cloud/runtime-init-conf.yaml
