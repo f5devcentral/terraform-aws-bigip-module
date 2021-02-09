@@ -46,7 +46,11 @@ bigip_password = [
 
 ```
 
-To use AWS secret manager password,we have to enable the variable "aws_secretmanager_auth" to true and supply the secret name to variable "aws_secretmanager_secret_id"
+|:point_up:  | To use AWS secret manager password,we have to enable the variable "aws_secretmanager_auth" to true and supply the secret name to variable "aws_secretmanager_secret_id" and also IAM Profile to "aws_iam_instance_profile"|
+|-----|:----|
+
+|:warning:  End Users are responsible of the IAM profile setup, please find useful links for [IAM Setup](https://aws.amazon.com/premiumsupport/knowledge-center/restrict-ec2-iam/)|
+|:-----------|
 
 ```
 cat terraform-aws-bigip-module/variables.tf
@@ -74,6 +78,8 @@ bigip_password = [
 ## Example Usage
 
 We have provided some common deployment [examples](https://github.com/f5devcentral/terraform-aws-bigip-module/tree/master/examples)
+
+
 
 #### Note
 There should be one to one mapping between subnet_ids and securitygroup_ids (for example if we have 2 or more external subnet_ids,we have to give same number of external securitygroup_ids to module)
