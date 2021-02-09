@@ -10,7 +10,7 @@ variable f5_username {
 }
 
 variable f5_password {
-  description = "The admin username of the F5 Bigip that will be deployed"
+  description = "Password of the F5 Bigip that will be deployed"
   default     = ""
 }
 

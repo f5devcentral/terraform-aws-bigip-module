@@ -72,7 +72,6 @@ resource "aws_iam_role_policy" "BigIpPolicy" {
         "Action": [
             "secretsmanager:GetResourcePolicy",
             "secretsmanager:GetSecretValue",
-            "secretsmanager:PutSecretValue",
             "secretsmanager:DescribeSecret",
             "secretsmanager:ListSecretVersionIds",
             "secretsmanager:UpdateSecretVersionStage"

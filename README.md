@@ -224,6 +224,7 @@ These variables have default values and don't have to be set to use this module.
 | Name | Description | Type | Default |
 |------|-------------|------|---------|
 | f5\_username | The admin username of the F5   BIG-IP that will be deployed | `string` | bigipuser |
+| f5\_password | Password of the F5  BIG-IP that will be deployed | `string` | "" |
 | ec2_instance_type 	| AWS EC2 instance type 	| string 	| m5.large 	|
 | f5_ami_search_name 	| BIG-IP AMI name to search for 	| string 	| F5 Networks BIGIP-14.* PAYG - Best 200Mbps* 	|
 | mgmt_eip 	| Enable an Elastic IP address on the management interface 	| bool 	| TRUE 	|

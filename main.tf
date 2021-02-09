@@ -2,20 +2,20 @@ terraform {
   required_version = "~> 0.13"
   required_providers {
     aws = {
-      source  = "hashicorp/aws"
-      version = "~>3.8.0"
+      source = "hashicorp/aws"
+      // version = "~>3.8.0"
     }
     random = {
-      source  = "hashicorp/random"
-      version = "~>2.3.0"
+      source = "hashicorp/random"
+      // version = "~>2.3.0"
     }
     template = {
-      source  = "hashicorp/template"
-      version = "~>2.1.2"
+      source = "hashicorp/template"
+      // version = "~>2.1.2"
     }
     null = {
-      source  = "hashicorp/null"
-      version = "~>2.1.2"
+      source = "hashicorp/null"
+      // version = "~>2.1.2"
     }
   }
 }
@@ -203,7 +203,7 @@ data "aws_ami" "f5_ami" {
 #
 #This resource is for static  primary and secondary private ips 
 resource "aws_network_interface" "mgmt" {
-  count           = "${length(compact(local.mgmt_public_private_ip_primary)) > 0 ? length(local.bigip_map["mgmt_subnet_ids"]) : 0}"
+  count           = length(compact(local.mgmt_public_private_ip_primary)) > 0 ? length(local.bigip_map["mgmt_subnet_ids"]) : 0
   subnet_id       = local.bigip_map["mgmt_subnet_ids"][count.index]["subnet_id"]
   private_ips     = [local.mgmt_public_private_ip_primary[count.index]]
   security_groups = var.mgmt_securitygroup_ids
