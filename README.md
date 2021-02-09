@@ -26,54 +26,18 @@ This module is supported in the following bigip and terraform version
 | BIG-IP 13.x  | X |
 
 ## Password Management
+ 
+|:point_up: |By default bigip module will have random password setting to give dynamic password generation|
+|----|---|
 
-By default bigip module will have random password setting to give dynamic password generation
-
-```
-cat terraform-aws-bigip-module/variables.tf
-
-variable aws_secretmanager_auth {
-  description = "Whether to use key vault to pass authentication"
-  type        = bool
-  default     = false
-}
-
-Outputs:
-
-bigip_password = [
-  "xxxxxxxxxxxxxxxxxx",
-]
-
-```
+|:point_up: |Users Can explicitly provide password as input to Module using optional Variable "f5_password"|
+|----|---|
 
 |:point_up:  | To use AWS secret manager password,we have to enable the variable "aws_secretmanager_auth" to true and supply the secret name to variable "aws_secretmanager_secret_id" and also IAM Profile to "aws_iam_instance_profile"|
-|-----|:----|
+|-----|----|
 
-|:warning:  End Users are responsible of the IAM profile setup, please find useful links for [IAM Setup](https://aws.amazon.com/premiumsupport/knowledge-center/restrict-ec2-iam/)|
-|:-----------|
-
-```
-cat terraform-aws-bigip-module/variables.tf
-
-variable aws_secretmanager_auth {
-  description = "Whether to use key vault to pass authentication"
-  type        = bool
-  default     = true
-}
-
-variable aws_secretmanager_secret_id {
-  description = "AWS Secret Manager Secret ID that stores the BIG-IP password"
-  type        = string
-  default     = "tf-aws-bigip-bigip-secret-9759"
-} 
-
-Outputs:
-
-bigip_password = [
-  "xxxxxxxxxxxxxxx",
-]
-
-```
+|:warning:  |End Users are responsible of the IAM profile setup, please find useful links for [IAM Setup](https://aws.amazon.com/premiumsupport/knowledge-center/restrict-ec2-iam/)|
+|:-----------|:----|
 
 ## Example Usage
 
