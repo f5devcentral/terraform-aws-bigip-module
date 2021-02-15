@@ -2,19 +2,19 @@ terraform {
   required_version = "~> 0.13"
   required_providers {
     aws = {
-      source = "hashicorp/aws"
+      source  = "hashicorp/aws"
       version = ">3.8.0"
     }
     random = {
-      source = "hashicorp/random"
+      source  = "hashicorp/random"
       version = ">2.3.0"
     }
     template = {
-      source = "hashicorp/template"
+      source  = "hashicorp/template"
       version = ">2.1.2"
     }
     null = {
-      source = "hashicorp/null"
+      source  = "hashicorp/null"
       version = ">2.1.2"
     }
   }
@@ -194,7 +194,7 @@ data "aws_ami" "f5_ami" {
 
   filter {
     name   = "name"
-    values = ["${var.f5_ami_search_name}"]
+    values = [var.f5_ami_search_name]
   }
 }
 
@@ -339,7 +339,7 @@ resource "aws_network_interface" "private1" {
 }
 
 data "template_file" "user_data_vm0" {
-  template = "${file("${path.module}/f5_onboard.tmpl")}"
+  template = file("${path.module}/f5_onboard.tmpl")
   vars = {
     bigip_username         = var.f5_username
     aws_secretmanager_auth = var.aws_secretmanager_auth
