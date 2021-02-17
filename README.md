@@ -207,6 +207,7 @@ These variables have default values and don't have to be set to use this module.
 | TS_URL | URL to download the BIG-IP Telemetry Streaming module | `string` | latest | 
 | FAST_URL | URL to download the BIG-IP FAST module | `string` | latest | 
 | CFE_URL | URL to download the BIG-IP Cloud Failover Extension module | `string` | latest |
+| INIT_URL | URL to download the BIG-IP runtime init module | `string` | latest |
 | libs\_dir | Directory on the BIG-IP to download the A&O Toolchain into | `string` | /config/cloud/aws/node_modules |
 | onboard\_log | Directory on the BIG-IP to store the cloud-init logs | `string` | /var/log/startup-script.log |
 | external\_subnet\_ids | he subnet id of the virtual network where the virtual machines will reside | `List of Maps` | [{ "subnet_id" = null, "public_ip" = null }] |
@@ -214,8 +215,7 @@ These variables have default values and don't have to be set to use this module.
 | external\_securitygroup\_ids | The Network Security Group ids for external network | `List` | [] |
 | internal\_securitygroup\_ids | The Network Security Group ids for internal network | `List` | [] |
 
-Note: For each external interface there will be one primary,secondary private ip will be assigned.
-
+~> **NOTE:** For each external interface there will be one primary,secondary private ip will be assigned.
 
 #### Output Variables
 | Name | Description |
@@ -228,10 +228,7 @@ Note: For each external interface there will be one primary,secondary private ip
 | private\_addresses | List of BIG-IP private addresses |
 | public\_addresses | List of BIG-IP public addresses |
 
-```
-NOTE: A local json file will get generated which contains the DO declaration
-```
-
+~> **NOTE:** A local json file will get generated which contains the DO declaration
 
 ## Support Information
 
