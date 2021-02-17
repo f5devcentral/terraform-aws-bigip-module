@@ -21,6 +21,7 @@ This module is supported in the following bigip and terraform version
 
 | BIGIP version | Terraform 0.13 | 
 |---------------|----------------|
+| BIG-IP 16.x  | X |
 | BIG-IP 15.x  | X |
 | BIG-IP 14.x  | X |
 | BIG-IP 13.x  | X |
@@ -196,7 +197,7 @@ These variables have default values and don't have to be set to use this module.
 | f5\_username | The admin username of the F5   BIG-IP that will be deployed | `string` | bigipuser |
 | f5\_password | Password of the F5  BIG-IP that will be deployed | `string` | "" |
 | ec2_instance_type 	| AWS EC2 instance type 	| string 	| m5.large 	|
-| f5_ami_search_name 	| BIG-IP AMI name to search for 	| string 	| F5 Networks BIGIP-14.* PAYG - Best 200Mbps* 	|
+| f5_ami_search_name 	| BIG-IP AMI name to search for 	| string 	| F5 BIGIP-* PAYG-Best 200Mbps* 	|
 | mgmt_eip 	| Enable an Elastic IP address on the management interface 	| bool 	| TRUE 	|
 | aws_secretmanager_auth 	| Whether to use key vault to pass authentication 	| bool 	| FALSE 	|
 | aws_secretmanager_secret_id 	| AWS Secret Manager Secret ID that stores the BIG-IP password 	| string 	|  	|
