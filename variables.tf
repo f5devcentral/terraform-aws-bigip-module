@@ -101,6 +101,11 @@ variable internal_source_dest_check {
   default     = true
 }
 
+variable external_source_dest_check {
+  description = "Disable source/dest check on External interface to allow inline routing for backends"
+  default = true
+}
+
 variable mgmt_securitygroup_ids {
   description = "The Network Security Group ids for management network "
   type        = list(string)
