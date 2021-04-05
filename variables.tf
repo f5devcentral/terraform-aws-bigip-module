@@ -98,7 +98,7 @@ variable internal_subnet_ids {
 
 variable internal_source_dest_check {
   description = "Disable source/dest check on Internal interface to allow inline routing for backends"
-  default = true
+  default     = true
 }
 
 variable mgmt_securitygroup_ids {
