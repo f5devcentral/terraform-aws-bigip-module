@@ -29,7 +29,7 @@ output bigip_password {
 
 output private_addresses {
   description = "List of BIG-IP private addresses"
-  value       = concat(aws_network_interface.public.*.private_ips, aws_network_interface.external_private.*.private_ips, aws_network_interface.private.*.private_ips, aws_network_interface.public1.*.private_ips, aws_network_interface.external_private1.*.private_ips, aws_network_interface.private1.*.private_ips)
+  value       = concat(aws_network_interface.mgmt.*.private_ips,aws_network_interface.mgmt1.*.private_ips,aws_network_interface.public.*.private_ips, aws_network_interface.external_private.*.private_ips, aws_network_interface.private.*.private_ips, aws_network_interface.public1.*.private_ips, aws_network_interface.external_private1.*.private_ips, aws_network_interface.private1.*.private_ips)
 }
 
 output public_addresses {

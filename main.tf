@@ -255,9 +255,10 @@ resource "aws_eip" "ext-pub" {
 resource "aws_network_interface" "public" {
   count = length(compact(local.external_public_private_ip_primary)) > 0 ? length(local.external_public_subnet_id) : 0
   #count             = length(local.external_public_subnet_id)
-  subnet_id       = local.external_public_subnet_id[count.index]
-  security_groups = var.external_securitygroup_ids
-  private_ips     = [local.external_public_private_ip_primary[count.index], local.external_public_private_ip_secondary[count.index]]
+  subnet_id         = local.external_public_subnet_id[count.index]
+  security_groups   = var.external_securitygroup_ids
+  private_ips       = [local.external_public_private_ip_primary[count.index], local.external_public_private_ip_secondary[count.index]]
+  source_dest_check = var.external_source_dest_check
   # private_ips_count = 1
   tags = {
     Name   = format("%s-%d", "BIGIP-External-Public-Interface", count.index)
@@ -272,6 +273,7 @@ resource "aws_network_interface" "public1" {
   #count             = length(local.external_public_subnet_id)
   subnet_id         = local.external_public_subnet_id[count.index]
   security_groups   = var.external_securitygroup_ids
+  source_dest_check = var.external_source_dest_check
   private_ips_count = 1
   tags = {
     Name   = format("%s-%d", "BIGIP-External-Public-Interface", count.index)
@@ -316,10 +318,10 @@ resource "aws_network_interface" "external_private1" {
 #This resource is for static  primary and secondary private ips
 
 resource "aws_network_interface" "private" {
-  count           = length(compact(local.internal_private_ip_primary)) > 0 ? length(local.internal_private_subnet_id) : 0
-  subnet_id       = local.internal_private_subnet_id[count.index]
-  security_groups = var.internal_securitygroup_ids
-  private_ips     = [local.internal_private_ip_primary[count.index]]
+  count             = length(compact(local.internal_private_ip_primary)) > 0 ? length(local.internal_private_subnet_id) : 0
+  subnet_id         = local.internal_private_subnet_id[count.index]
+  security_groups   = var.internal_securitygroup_ids
+  private_ips       = [local.internal_private_ip_primary[count.index]]
   source_dest_check = var.internal_source_dest_check
   tags = {
     Name   = format("%s-%d", "BIGIP-Internal-Interface", count.index)
