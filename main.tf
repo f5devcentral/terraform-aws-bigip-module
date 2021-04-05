@@ -320,6 +320,7 @@ resource "aws_network_interface" "private" {
   subnet_id       = local.internal_private_subnet_id[count.index]
   security_groups = var.internal_securitygroup_ids
   private_ips     = [local.internal_private_ip_primary[count.index]]
+  source_dest_check = var.internal_source_dest_check
   tags = {
     Name   = format("%s-%d", "BIGIP-Internal-Interface", count.index)
     Prefix = format("%s", local.instance_prefix)
@@ -333,6 +334,7 @@ resource "aws_network_interface" "private1" {
   subnet_id         = local.internal_private_subnet_id[count.index]
   security_groups   = var.internal_securitygroup_ids
   private_ips_count = 0
+  source_dest_check = var.internal_source_dest_check
   tags = {
     Name   = format("%s-%d", "BIGIP-Internal-Interface", count.index)
     Prefix = format("%s", local.instance_prefix)

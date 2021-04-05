@@ -96,6 +96,11 @@ variable internal_subnet_ids {
   default = [{ "subnet_id" = null, "public_ip" = null, "private_ip_primary" = null }]
 }
 
+variable internal_source_dest_check {
+  description = "Disable source/dest check on Internal interface to allow inline routing for backends"
+  default = true
+}
+
 variable mgmt_securitygroup_ids {
   description = "The Network Security Group ids for management network "
   type        = list(string)
