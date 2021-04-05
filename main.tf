@@ -255,9 +255,9 @@ resource "aws_eip" "ext-pub" {
 resource "aws_network_interface" "public" {
   count = length(compact(local.external_public_private_ip_primary)) > 0 ? length(local.external_public_subnet_id) : 0
   #count             = length(local.external_public_subnet_id)
-  subnet_id       = local.external_public_subnet_id[count.index]
-  security_groups = var.external_securitygroup_ids
-  private_ips     = [local.external_public_private_ip_primary[count.index], local.external_public_private_ip_secondary[count.index]]
+  subnet_id         = local.external_public_subnet_id[count.index]
+  security_groups   = var.external_securitygroup_ids
+  private_ips       = [local.external_public_private_ip_primary[count.index], local.external_public_private_ip_secondary[count.index]]
   source_dest_check = var.external_source_dest_check
   # private_ips_count = 1
   tags = {
