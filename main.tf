@@ -368,6 +368,11 @@ resource "null_resource" "delay" {
   }
 }
 
+resource "aws_key_pair" "instane_key" {
+  key_name   = format("%s-key", local.instance_prefix)
+  public_key = file("~/.ssh/id_rsa.pub")
+}
+
 # Deploy BIG-IP
 #
 resource "aws_instance" "f5_bigip" {
@@ -375,8 +380,7 @@ resource "aws_instance" "f5_bigip" {
   count         = var.f5_instance_count
   instance_type = var.ec2_instance_type
   ami           = data.aws_ami.f5_ami.id
-  //ami           = "ami-0fb163d2f818ea5da"
-  key_name = var.ec2_key_name
+  key_name      = var.ec2_key_name == "~/.ssh/id_rsa.pub" ? aws_key_pair.instane_key.key_name : var.ec2_key_name
 
   root_block_device {
     delete_on_termination = true
