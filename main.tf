@@ -347,6 +347,7 @@ data "template_file" "user_data_vm0" {
   template = file("${path.module}/f5_onboard.tmpl")
   vars = {
     bigip_username         = var.f5_username
+    ssh_keypair            = var.ec2_key_name == "~/.ssh/id_rsa.pub" ? aws_key_pair.instane_key.public_key : var.ec2_key_name
     aws_secretmanager_auth = var.aws_secretmanager_auth
     bigip_password         = (var.f5_password == "") ? (var.aws_secretmanager_auth ? data.aws_secretsmanager_secret_version.current[0].secret_id : random_string.dynamic_password.result) : var.f5_password
     INIT_URL               = var.INIT_URL,

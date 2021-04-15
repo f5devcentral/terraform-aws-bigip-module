@@ -26,6 +26,9 @@ runtime_parameters:
   - name: USER_NAME
     type: static
     value: ${bigip_username}
+  - name: SSH_KEYS
+    type: static
+    value: "${ssh_keypair}"
 EOF
 
 if ${aws_secretmanager_auth}
