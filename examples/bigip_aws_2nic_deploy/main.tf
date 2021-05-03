@@ -121,6 +121,7 @@ module "external-network-security-group-public" {
 #
 module "mgmt-network-security-group" {
   source = "terraform-aws-modules/security-group/aws"
+  # insert the 2 required variables here
 
   name        = format("%s-mgmt-nsg-%s", var.prefix, random_id.id.hex)
   description = "Security group for BIG-IP Management"
@@ -156,8 +157,8 @@ module bigip {
   //ec2_key_name                = aws_key_pair.generated_key.key_name
   aws_secretmanager_secret_id = aws_secretsmanager_secret.bigip.id
   mgmt_subnet_ids             = [{ "subnet_id" = aws_subnet.mgmt.id, "public_ip" = true, "private_ip_primary" = "" }]
-  mgmt_securitygroup_ids      = [module.mgmt-network-security-group.this_security_group_id]
-  external_securitygroup_ids  = [module.external-network-security-group-public.this_security_group_id]
+  mgmt_securitygroup_ids      = [module.mgmt-network-security-group.security_group_id]
+  external_securitygroup_ids  = [module.external-network-security-group-public.security_group_id]
   external_subnet_ids         = [{ "subnet_id" = aws_subnet.external-public.id, "public_ip" = true, "private_ip_primary" = "", "private_ip_secondary" = "" }]
 }
 

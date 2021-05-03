@@ -194,7 +194,7 @@ data "aws_ami" "f5_ami" {
   owners = ["aws-marketplace"]
 
   filter {
-    name   = "name"
+    name   = "description"
     values = [var.f5_ami_search_name]
   }
 }
