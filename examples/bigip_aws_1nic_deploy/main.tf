@@ -192,7 +192,7 @@ module bigip {
   //aws_secretmanager_secret_id = aws_secretsmanager_secret.bigip.id
   //aws_iam_instance_profile    = aws_iam_instance_profile.instance_profile.name
   mgmt_subnet_ids        = [{ "subnet_id" = aws_subnet.mgmt.id, "public_ip" = true, "private_ip_primary" = "" }]
-  mgmt_securitygroup_ids = [module.mgmt-network-security-group.this_security_group_id]
+  mgmt_securitygroup_ids = [module.mgmt-network-security-group.security_group_id]
 }
 
 resource "null_resource" "clusterDO" {
