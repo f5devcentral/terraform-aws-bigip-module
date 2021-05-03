@@ -247,6 +247,13 @@ resource "aws_eip" "ext-pub" {
   depends_on        = [aws_eip.mgmt]
 }
 
+resource "aws_eip" "vip" {
+  count                     = length(local.external_public_subnet_id)
+  network_interface         = length(compact(local.external_public_private_ip_primary)) > 0 ? aws_network_interface.public[count.index].id : aws_network_interface.public1[count.index].id
+  vpc                       = true
+  associate_with_private_ip = length(compact(local.external_public_private_ip_primary)) > 0 ? element(tolist(aws_network_interface.public[count.index].private_ips), 1) : element(tolist(aws_network_interface.public1[count.index].private_ips), 1)
+}
+
 #
 # Create Public External Network Interfaces
 #
