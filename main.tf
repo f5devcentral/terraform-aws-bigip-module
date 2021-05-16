@@ -248,6 +248,16 @@ resource "aws_eip" "ext-pub" {
 }
 
 #
+# add an elastic IP to the BIG-IP External interface secondary IP [only for first external public interface]
+#
+resource "aws_eip" "vip" {
+  count                     = length(local.external_public_subnet_id) > 0 ? 1 : 0
+  network_interface         = length(compact(local.external_public_private_ip_primary)) > 0 ? aws_network_interface.public[0].id : aws_network_interface.public1[0].id
+  vpc                       = true
+  associate_with_private_ip = length(compact(local.external_public_private_ip_primary)) > 0 ? element(compact([for x in tolist(aws_network_interface.public[0].private_ips) : x == aws_network_interface.public[0].private_ip ? "" : x]), 0) : element(compact([for x in tolist(aws_network_interface.public1[0].private_ips) : x == aws_network_interface.public1[0].private_ip ? "" : x]), 0)
+}
+
+#
 # Create Public External Network Interfaces
 #
 #This resource is for static  primary and secondary private ips
