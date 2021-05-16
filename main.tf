@@ -194,7 +194,7 @@ data "aws_ami" "f5_ami" {
   owners = ["aws-marketplace"]
 
   filter {
-    name   = "name"
+    name   = "description"
     values = [var.f5_ami_search_name]
   }
 }
@@ -245,6 +245,16 @@ resource "aws_eip" "ext-pub" {
   network_interface = length(compact(local.external_public_private_ip_primary)) > 0 ? aws_network_interface.public[count.index].id : aws_network_interface.public1[count.index].id
   vpc               = true
   depends_on        = [aws_eip.mgmt]
+}
+
+#
+# add an elastic IP to the BIG-IP External interface secondary IP [only for first external public interface]
+#
+resource "aws_eip" "vip" {
+  count                     = length(local.external_public_subnet_id) > 0 ? 1 : 0
+  network_interface         = length(compact(local.external_public_private_ip_primary)) > 0 ? aws_network_interface.public[0].id : aws_network_interface.public1[0].id
+  vpc                       = true
+  associate_with_private_ip = length(compact(local.external_public_private_ip_primary)) > 0 ? element(compact([for x in tolist(aws_network_interface.public[0].private_ips) : x == aws_network_interface.public[0].private_ip ? "" : x]), 0) : element(compact([for x in tolist(aws_network_interface.public1[0].private_ips) : x == aws_network_interface.public1[0].private_ip ? "" : x]), 0)
 }
 
 #
@@ -347,6 +357,7 @@ data "template_file" "user_data_vm0" {
   template = file("${path.module}/f5_onboard.tmpl")
   vars = {
     bigip_username         = var.f5_username
+    ssh_keypair            = var.ec2_key_name == "~/.ssh/id_rsa.pub" ? aws_key_pair.instane_key.public_key : var.ec2_key_name
     aws_secretmanager_auth = var.aws_secretmanager_auth
     bigip_password         = (var.f5_password == "") ? (var.aws_secretmanager_auth ? data.aws_secretsmanager_secret_version.current[0].secret_id : random_string.dynamic_password.result) : var.f5_password
     INIT_URL               = var.INIT_URL,
@@ -368,6 +379,11 @@ resource "null_resource" "delay" {
   }
 }
 
+resource "aws_key_pair" "instane_key" {
+  key_name   = format("%s-key", local.instance_prefix)
+  public_key = file("~/.ssh/id_rsa.pub")
+}
+
 # Deploy BIG-IP
 #
 resource "aws_instance" "f5_bigip" {
@@ -375,8 +391,7 @@ resource "aws_instance" "f5_bigip" {
   count         = var.f5_instance_count
   instance_type = var.ec2_instance_type
   ami           = data.aws_ami.f5_ami.id
-  //ami           = "ami-0fb163d2f818ea5da"
-  key_name = var.ec2_key_name
+  key_name      = var.ec2_key_name == "~/.ssh/id_rsa.pub" ? aws_key_pair.instane_key.key_name : var.ec2_key_name
 
   root_block_device {
     delete_on_termination = true
