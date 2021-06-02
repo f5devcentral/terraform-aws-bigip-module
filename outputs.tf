@@ -32,6 +32,20 @@ output private_addresses {
   value       = concat(aws_network_interface.mgmt.*.private_ips, aws_network_interface.mgmt1.*.private_ips, aws_network_interface.public.*.private_ips, aws_network_interface.external_private.*.private_ips, aws_network_interface.private.*.private_ips, aws_network_interface.public1.*.private_ips, aws_network_interface.external_private1.*.private_ips, aws_network_interface.private1.*.private_ips)
 }
 
+output private_addresses_new {
+  description = "List of BIG-IP private addresses"
+  value       = {
+    mgmt              = aws_network_interface.mgmt.*.private_ips
+    mgmt1             = aws_network_interface.mgmt1.*.private_ips
+    public            = aws_network_interface.public.*.private_ips
+    external_private  = aws_network_interface.external_private.*.private_ips
+    private           = aws_network_interface.private.*.private_ips
+    public1           = aws_network_interface.public1.*.private_ips
+    external_private1 = aws_network_interface.external_private1.*.private_ips
+    private1          = aws_network_interface.private1.*.private_ips
+  }  
+}
+
 output public_addresses {
   description = "List of BIG-IP public addresses"
   value       = concat(aws_eip.ext-pub.*.public_ip)
