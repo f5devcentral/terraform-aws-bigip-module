@@ -35,16 +35,14 @@ output private_addresses {
 output private_addresses_new {
   description = "List of BIG-IP private addresses"
   value       = {
-    mgmt              = aws_network_interface.mgmt.*.private_ips
-    mgmt1             = aws_network_interface.mgmt1.*.private_ips
-    public            = aws_network_interface.public.*.private_ips
-    external_private  = aws_network_interface.external_private.*.private_ips
-    private           = aws_network_interface.private.*.private_ips
-    public1           = aws_network_interface.public1.*.private_ips
-    external_private1 = aws_network_interface.external_private1.*.private_ips
-    private1          = aws_network_interface.private1.*.private_ips
+    mgmt              = length(compact(local.mgmt_public_private_ip_primary)) > 0 ? aws_network_interface.mgmt.*.private_ips :aws_network_interface.mgmt1.*.private_ips
+    public            = length(compact(local.external_public_private_ip_primary)) > 0 ? aws_network_interface.public.*.private_ips : aws_network_interface.public1.*.private_ips
+    external_private  = length(compact(local.external_private_ip_primary)) > 0 ? aws_network_interface.external_private.*.private_ips : aws_network_interface.external_private1.*.private_ips
+    private           = length(compact(local.internal_private_ip_primary)) > 0 ? aws_network_interface.private.*.private_ips : aws_network_interface.private1.*.private_ips
   }  
 }
+
+length(compact(local.external_public_private_ip_primary)) > 0
 
 output public_addresses {
   description = "List of BIG-IP public addresses"
