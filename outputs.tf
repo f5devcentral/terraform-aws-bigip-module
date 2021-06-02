@@ -42,8 +42,6 @@ output private_addresses_new {
   }  
 }
 
-length(compact(local.external_public_private_ip_primary)) > 0
-
 output public_addresses {
   description = "List of BIG-IP public addresses"
   value       = concat(aws_eip.ext-pub.*.public_ip)
