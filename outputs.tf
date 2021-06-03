@@ -32,6 +32,28 @@ output private_addresses {
   value       = concat(aws_network_interface.mgmt.*.private_ips, aws_network_interface.mgmt1.*.private_ips, aws_network_interface.public.*.private_ips, aws_network_interface.external_private.*.private_ips, aws_network_interface.private.*.private_ips, aws_network_interface.public1.*.private_ips, aws_network_interface.external_private1.*.private_ips, aws_network_interface.private1.*.private_ips)
 }
 
+output private_addresses_new {
+  description = "List of BIG-IP private addresses"
+  value       = {
+    mgmt              = {
+      private_ip  = length(compact(local.mgmt_public_private_ip_primary)) > 0 ? aws_network_interface.mgmt.*.private_ip :aws_network_interface.mgmt1.*.private_ip
+      private_ips = length(compact(local.mgmt_public_private_ip_primary)) > 0 ? aws_network_interface.mgmt.*.private_ips :aws_network_interface.mgmt1.*.private_ips
+    }
+    public      = {
+      private_ip  = length(compact(local.external_public_private_ip_primary)) > 0 ? aws_network_interface.public.*.private_ip : aws_network_interface.public1.*.private_ip
+      private_ips = length(compact(local.external_public_private_ip_primary)) > 0 ? aws_network_interface.public.*.private_ips : aws_network_interface.public1.*.private_ips
+    }
+    external_private  = {
+      private_ip  = length(compact(local.external_private_ip_primary)) > 0 ? aws_network_interface.external_private.*.private_ip : aws_network_interface.external_private1.*.private_ip
+      private_ips = length(compact(local.external_private_ip_primary)) > 0 ? aws_network_interface.external_private.*.private_ips : aws_network_interface.external_private1.*.private_ips
+    }
+    private           = {
+      private_ip  = length(compact(local.internal_private_ip_primary)) > 0 ? aws_network_interface.private.*.private_ip : aws_network_interface.private1.*.private_ip
+      private_ips = length(compact(local.internal_private_ip_primary)) > 0 ? aws_network_interface.private.*.private_ips : aws_network_interface.private1.*.private_ips
+    }
+  }  
+}
+
 output public_addresses {
   description = "List of BIG-IP public addresses"
   value       = concat(aws_eip.ext-pub.*.public_ip)
