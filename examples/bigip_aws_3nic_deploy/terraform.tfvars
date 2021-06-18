@@ -1,3 +1,3 @@
 
-region     = "ap-south-1"
+region     = "us-east-1"
 AllowedIPs = ["0.0.0.0/0"]
