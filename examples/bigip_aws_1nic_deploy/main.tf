@@ -183,11 +183,11 @@ resource "aws_key_pair" "generated_key" {
 # Create BIG-IP
 #
 module bigip {
-  source = "../../"
-  count  = var.instance_count
-  prefix = format("%s-1nic", var.prefix)
-  //ec2_key_name = aws_key_pair.generated_key.key_name
-  f5_password = random_string.password.result
+  source       = "../../"
+  count        = var.instance_count
+  prefix       = format("%s-1nic", var.prefix)
+  ec2_key_name = aws_key_pair.generated_key.key_name
+  f5_password  = random_string.password.result
   //aws_secretmanager_auth      = false
   //aws_secretmanager_secret_id = aws_secretsmanager_secret.bigip.id
   //aws_iam_instance_profile    = aws_iam_instance_profile.instance_profile.name
