@@ -17,6 +17,7 @@ exec 2>&1
 
 # save config
 tmsh save sys config
+ssh_keypair2=$(cat /home/admin/.ssh/authorized_keys)
 
 mkdir -p /config/cloud
 
@@ -28,8 +29,8 @@ runtime_parameters:
     value: ${bigip_username}
   - name: SSH_KEYS
     type: static
-    value: "${ssh_keypair}"
 EOF
+echo "    value: $ssh_keypair2" >> /config/cloud/runtime-init-conf.yaml
 
 if ${aws_secretmanager_auth}
 then
