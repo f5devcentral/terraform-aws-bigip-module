@@ -1,6 +1,6 @@
 ## Deploys BIG-IP in AWS Cloud
 
-This Terraform module deploys N-nic F5 BIG-IP in AWS cloud,and with module count feature we can also deploy multiple instances of BIG-IP.
+This Terraform module deploys N-nic F5 BIG-IP in AWS cloud,and with module `count` feature we can also deploy multiple instances of BIG-IP.
 
 ## Prerequisites
 
@@ -51,8 +51,8 @@ We have provided some common deployment [examples](https://github.com/f5devcentr
 
 ~> **WARNING** If it is static private ip allocation we can't use module count as same private ips will be tried to allocate for multiple bigip instances based on module count.
 
-> **WARNING**
-With Dynamic private ip allocation,we have to pass null value to primary/secondary private ip declaration and module count will be supported.
+| :warning:  **WARNING** | With Dynamic private ip allocation,we have to pass null value to primary/secondary private ip declaration and module count will be supported.|
+|:-----------|:----|
 
 !> **Note:** Sometimes it is observed that the given static primary and secondary private ips may get exchanged. This is the limitation present in aws.
 
@@ -63,7 +63,6 @@ With Dynamic private ip allocation,we have to pass null value to primary/seconda
 #Example 1-NIC Deployment Module usage
 #
 module bigip {
-  count                  = var.instance_count
   source                 = "../../"
   prefix                 = "bigip-aws-1nic"
   ec2_key_name           = aws_key_pair.generated_key.key_name
@@ -75,7 +74,6 @@ module bigip {
 #Example 2-NIC Deployment Module usage
 #
 module bigip {
-  count                  = var.instance_count
   source                      = "../../"
   prefix                      = "bigip-aws-2nic"
   ec2_key_name                = aws_key_pair.generated_key.key_name
@@ -89,7 +87,6 @@ module bigip {
 #Example 3-NIC Deployment  Module usage
 #
 module bigip {
-  count                  = var.instance_count
   source                      = "../../"
   prefix                      = "bigip-aws-3nic"
   ec2_key_name                = aws_key_pair.generated_key.key_name
@@ -106,7 +103,6 @@ module bigip {
 #
 
 module bigip {
-  count                  = var.instance_count
   source                      = "../../"
   prefix                      = "bigip-aws-4nic"
   ec2_key_name                = aws_key_pair.generated_key.key_name
@@ -117,6 +113,19 @@ module bigip {
   internal_subnet_ids         = [{"subnet_id" =  "subnet_id_internal", "public_ip"=false }]
   internal_securitygroup_ids  = ["securitygropu_id_internal"]
 }
+
+#
+#Example to deploy 2 BIGIP-1 Nics using Module with module count feature
+#
+module bigip {
+  count                  = 2
+  source                 = "../../"
+  prefix                 = "bigip-aws-1nic"
+  ec2_key_name           = aws_key_pair.generated_key.key_name
+  mgmt_subnet_ids        = [{ "subnet_id" = "subnet_id_mgmt", "public_ip" = true, "private_ip_primary" =  ""}]
+  mgmt_securitygroup_ids = ["securitygroup_id_mgmt"]
+}
+
 ```
 
 + Similarly we can have N-nic deployments based on user provided subnet_ids and securitygroup_ids
@@ -131,7 +140,6 @@ module bigip {
 #
 module bigip {
   source                      = "../../"
-  count                       = var.instance_count
   prefix                      = format("%s-3nic", var.prefix)
   ec2_key_name                = aws_key_pair.generated_key.key_name
   aws_secretmanager_secret_id = aws_secretsmanager_secret.bigip.id
@@ -154,7 +162,6 @@ These variables must be set in the module block when using this module.
 | ec2_key_name 	| AWS EC2 Key name for SSH access,managing key is out of band module, user can reference this key name from [aws_key_pair](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/key_pair)	| string 	|  	|
 | mgmt\_subnet\_ids | Map with Subnet-id and public_ip as keys for the management subnet | `List of Maps` |
 | mgmt\_securitygroup\_ids | securitygroup\_ids for the management interface | `List` |
-| instance\_count | Number of Bigip instances to spin up | `number` |
 
 #### Optional Input Variables
 
