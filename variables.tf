@@ -37,8 +37,6 @@ variable ec2_instance_type {
 variable ec2_key_name {
   description = "AWS EC2 Key name for SSH access"
   type        = string
-  //default     = "~/.ssh/id_rsa.pub"
-  //default     = "tf-demo-key"
 }
 
 variable mgmt_eip {
