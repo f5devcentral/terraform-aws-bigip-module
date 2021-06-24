@@ -151,7 +151,7 @@ These variables must be set in the module block when using this module.
 | Name | Description | Type | 
 |------|-------------|------|
 | prefix | This value is inserted in the beginning of each aws object. Note: requires alpha-numeric without special character | `string` |
-| ec2_key_name 	| AWS EC2 Key name for SSH access 	| string 	|  	|
+| ec2_key_name 	| AWS EC2 Key name for SSH access,managing key is out of band module, user can reference this key name from [aws_key_pair](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/key_pair)	| string 	|  	|
 | mgmt\_subnet\_ids | Map with Subnet-id and public_ip as keys for the management subnet | `List of Maps` |
 | mgmt\_securitygroup\_ids | securitygroup\_ids for the management interface | `List` |
 | instance\_count | Number of Bigip instances to spin up | `number` |
