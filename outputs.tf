@@ -1,13 +1,13 @@
 # BIG-IP Management Public IP Addresses
 output mgmtPublicIP {
   description = "List of BIG-IP public IP addresses for the management interfaces"
-  value       = aws_eip.mgmt[*].public_ip
+  value       = flatten(aws_eip.mgmt[*].public_ip)
 }
 
 # BIG-IP Management Public DNS
 output mgmtPublicDNS {
   description = "List of BIG-IP public DNS records for the management interfaces"
-  value       = aws_eip.mgmt[*].public_dns
+  value       = flatten(aws_eip.mgmt[*].public_dns)
 }
 
 # BIG-IP Management Port
