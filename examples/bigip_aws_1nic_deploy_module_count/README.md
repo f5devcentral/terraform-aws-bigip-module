@@ -1,37 +1,36 @@
 ## Deploys F5 BIG-IP AWS Cloud
 
-This Terraform module deploys 1-NIC BIG-IP in AWS and by using module count feature we can also deploy multiple BIGIP instances(default value of count as 1 ) with the following characteristics:
+This Terraform module example deploys 2 BIG-IPs(1-Nic) in AWS and by using module count feature.
 
-BIG-IP 1 Nic as management interface associated with user provided subnet and security-group
+- we can deploy multiple BIGIP instances by using module count feature. ref: [module count](https://www.terraform.io/docs/language/meta-arguments/count.html)
 
+## Steps to clone and use the module example locally
 
-## Steps to clone and use the provisioner locally
-
-```
-$ git clone https://github.com/f5devcentral/terraform-aws-bigip-module
-$ cd terraform-aws-bigip-module/examples/bigip_aws_1nic_deploy/
-
+```shell
+git clone https://github.com/f5devcentral/terraform-aws-bigip-module
+cd terraform-aws-bigip-module/examples/bigip_aws_1nic_deploy_module_count/
 ```
 
 - Then follow the stated process in Example Usage below
 
 ## Example Usage
 
->Modify terraform.tfvars according to the requirement by changing `region` and `AllowedIPs` variables as follows
+- Modify `terraform.tfvars` according to the requirement by changing `region` and `AllowedIPs` variables as follows:
 
-```
-region = "ap-south-1"
-AllowedIPs = ["0.0.0.0/0"]
-```
-Next, Run the following commands to create and destroy your configuration
+    ```hcl
+    region = "ap-south-1"
+    AllowedIPs = ["0.0.0.0/0"]
+    instance_count    = 2
+    ```
 
-```
-$ terraform init
-$ terraform plan
-$ terraform apply
-$ terraform destroy
+- Next, run the following commands to create and destroy your configuration
 
-```
+    ```shell
+    terraform init
+    terraform plan
+    terraform apply
+    terraform destroy
+    ```
 
 #### Optional Input Variables
 
@@ -56,8 +55,5 @@ $ terraform destroy
 | public\_addresses | List of BIG-IP public addresses |
 | vpc\_id | VPC Id where BIG-IP Deployed |
 
-
-
-```
-NOTE: A local json file will get generated which contains the DO declaration
-```
+**NOTE** |A local json file will get generated which contains the DO declaration|
+|------|-----|
