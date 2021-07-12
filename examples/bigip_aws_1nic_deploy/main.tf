@@ -184,6 +184,7 @@ resource "aws_key_pair" "generated_key" {
 #
 module bigip {
   source       = "../../"
+  count        = var.instance_count
   prefix       = format("%s-1nic", var.prefix)
   ec2_key_name = aws_key_pair.generated_key.key_name
   f5_password  = random_string.password.result
