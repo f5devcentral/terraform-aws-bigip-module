@@ -374,17 +374,9 @@ data "template_file" "user_data_vm0" {
   }
 }
 
-resource null_resource delay {
-  provisioner "local-exec" {
-    command = "sleep 30"
-  }
-}
-
 # Deploy BIG-IP
 #
 resource aws_instance f5_bigip {
-  # determine the number of BIG-IPs to deploy
-  count         = var.f5_instance_count
   instance_type = var.ec2_instance_type
   ami           = data.aws_ami.f5_ami.id
   key_name      = var.ec2_key_name
@@ -395,8 +387,7 @@ resource aws_instance f5_bigip {
 
   # set the mgmt interface
   dynamic "network_interface" {
-    #for_each = toset([aws_network_interface.mgmt[count.index].id])
-    for_each = length(compact(local.mgmt_public_private_ip_primary)) > 0 ? toset([aws_network_interface.mgmt[count.index].id]) : toset([aws_network_interface.mgmt1[count.index].id])
+    for_each = length(compact(local.mgmt_public_private_ip_primary)) > 0 ? toset([aws_network_interface.mgmt[0].id]) : toset([aws_network_interface.mgmt1[0].id])
     content {
       network_interface_id = network_interface.value
       device_index         = 0
@@ -405,9 +396,7 @@ resource aws_instance f5_bigip {
 
   # set the public interface only if an interface is defined
   dynamic "network_interface" {
-    for_each = length(local.ext_interfaces) > count.index ? toset(local.ext_interfaces) : toset([])
-    //for_each = length(aws_network_interface.public) > count.index ? toset([aws_network_interface.public[count.index].id]) : toset([])
-
+    for_each = length(local.ext_interfaces) > 0 ? toset(local.ext_interfaces) : toset([])
     content {
       network_interface_id = network_interface.value
       device_index         = 1 + index(tolist(toset(local.ext_interfaces)), network_interface.value)
@@ -416,32 +405,29 @@ resource aws_instance f5_bigip {
 
   # set the private interface only if an interface is defined
   dynamic "network_interface" {
-    for_each = length(aws_network_interface.private) > count.index ? toset([aws_network_interface.private[count.index].id]) : toset([])
-
+    for_each = length(aws_network_interface.private) > 0 ? toset([aws_network_interface.private[0].id]) : toset([])
     content {
       network_interface_id = network_interface.value
-      device_index         = (length(local.ext_interfaces) + 1) + index(tolist(toset([aws_network_interface.private[count.index].id])), network_interface.value)
+      device_index         = (length(local.ext_interfaces) + 1) + index(tolist(toset([aws_network_interface.private[0].id])), network_interface.value)
     }
   }
 
   dynamic "network_interface" {
-    for_each = length(aws_network_interface.private1) > count.index ? toset([aws_network_interface.private1[count.index].id]) : toset([])
-
+    for_each = length(aws_network_interface.private1) > 0 ? toset([aws_network_interface.private1[0].id]) : toset([])
     content {
       network_interface_id = network_interface.value
-      device_index         = (length(local.ext_interfaces) + 1) + index(tolist(toset([aws_network_interface.private1[count.index].id])), network_interface.value)
+      device_index         = (length(local.ext_interfaces) + 1) + index(tolist(toset([aws_network_interface.private1[0].id])), network_interface.value)
     }
   }
   iam_instance_profile = var.aws_iam_instance_profile
   user_data            = data.template_file.user_data_vm0.rendered
   provisioner "local-exec" {
-    //  command = "aws ec2 wait instance-status-ok --instance-ids ${aws_instance.f5_bigip[count.index].id} --region ap-south-1"
-    command = "sleep 300"
+    command = "sleep 420"
   }
   tags = {
-    Name = format("%s-%d", local.instance_prefix, count.index)
+    Name = format("%s", local.instance_prefix)
   }
-  depends_on = [aws_eip.mgmt, aws_network_interface.public, aws_network_interface.private, null_resource.delay]
+  depends_on = [aws_eip.mgmt, aws_network_interface.public, aws_network_interface.private]
 }
 
 data template_file clustermemberDO1 {

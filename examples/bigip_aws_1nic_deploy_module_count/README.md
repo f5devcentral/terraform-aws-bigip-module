@@ -1,12 +1,14 @@
 ## Deploys F5 BIG-IP AWS Cloud
 
-This Terraform module example deploys 3-NIC BIG-IP in AWS, deployed BIGIP will be having management/external/internal interface associated with user provided subnet and security-group
+This Terraform module example deploys 2 BIG-IPs(1-Nic) in AWS and by using module count feature.
+
+- we can deploy multiple BIGIP instances by using module count feature. ref: [module count](https://www.terraform.io/docs/language/meta-arguments/count.html)
 
 ## Steps to clone and use the module example locally
 
 ```shell
 git clone https://github.com/f5devcentral/terraform-aws-bigip-module
-cd terraform-aws-bigip-module/examples/bigip_aws_3nic_deploy/
+cd terraform-aws-bigip-module/examples/bigip_aws_1nic_deploy_module_count/
 ```
 
 - Then follow the stated process in Example Usage below
@@ -18,6 +20,7 @@ cd terraform-aws-bigip-module/examples/bigip_aws_3nic_deploy/
     ```hcl
     region = "ap-south-1"
     AllowedIPs = ["0.0.0.0/0"]
+    instance_count    = 2
     ```
 
 - Next, run the following commands to create and destroy your configuration
@@ -36,6 +39,7 @@ cd terraform-aws-bigip-module/examples/bigip_aws_3nic_deploy/
 | prefix | Prefix for resources created by this module | `string` | tf-aws-bigip |
 | cidr | aws VPC CIDR | `string` | 10.2.0.0/16 |
 | availabilityZones | If you want the VM placed in an Availability Zone, and the AWS region you are deploying to supports it, specify the numbers of the existing Availability Zone you want to use | `List` | ["us-east-1a"] |
+| instance_count | Number of Bigip instances to create | `number` | 1 |
 
 #### Output Variables
 
@@ -51,4 +55,5 @@ cd terraform-aws-bigip-module/examples/bigip_aws_3nic_deploy/
 | public\_addresses | List of BIG-IP public addresses |
 | vpc\_id | VPC Id where BIG-IP Deployed |
 
-**NOTE:** A local json file will get generated which contains the DO declaration
+**NOTE** |A local json file will get generated which contains the DO declaration|
+|------|-----|
