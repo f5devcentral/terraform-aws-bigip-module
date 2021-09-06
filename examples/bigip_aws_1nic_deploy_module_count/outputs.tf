@@ -1,11 +1,11 @@
 # BIG-IP Management Public IP Addresses
 output mgmtPublicIP {
-  value = flatten(module.bigip.*.mgmtPublicIP)
+  value = module.bigip.*.mgmtPublicIP
 }
 
 # BIG-IP Management Public DNS Address
 output mgmtPublicDNS {
-  value = flatten(module.bigip.*.mgmtPublicDNS)
+  value = module.bigip.*.mgmtPublicDNS
 }
 
 # BIG-IP Management Port
@@ -25,7 +25,7 @@ output bigip_password {
 
 output mgmtPublicURL {
   description = "mgmtPublicURL"
-  value       = [for i in range(var.instance_count) : format("https://%s:%s", module.bigip[i].mgmtPublicDNS[0], module.bigip[i].mgmtPort)]
+  value       = length(flatten(module.bigip.*.mgmtPublicDNS)) > 0 ? [for i in range(var.instance_count):  format("https://%s:%s",module.bigip[i].mgmtPublicDNS[0],module.bigip[i].mgmtPort)] : tolist([])
 }
 
 # VPC ID used for BIG-IP Deploy

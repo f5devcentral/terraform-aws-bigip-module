@@ -230,7 +230,7 @@ resource "aws_network_interface" "mgmt1" {
 # add an elastic IP to the BIG-IP management interface
 #
 resource "aws_eip" "mgmt" {
-  count = length(local.bigip_map["mgmt_subnet_ids"])
+  count = length(local.mgmt_public_subnet_id) > 0 ? (length(local.bigip_map["mgmt_subnet_ids"])) : 0
   #network_interface = aws_network_interface.mgmt[count.index].id
   network_interface = length(compact(local.mgmt_public_private_ip_primary)) > 0 ? aws_network_interface.mgmt[count.index].id : aws_network_interface.mgmt1[count.index].id
   vpc               = true
@@ -434,7 +434,7 @@ data template_file clustermemberDO1 {
   count    = local.total_nics == 1 ? 1 : 0
   template = file("${path.module}/onboard_do_1nic.tpl")
   vars = {
-    hostname      = aws_eip.mgmt[0].public_dns
+    hostname      = length(aws_eip.mgmt) > 0 ? aws_eip.mgmt[0].public_dns : ""
     name_servers  = join(",", formatlist("\"%s\"", ["169.254.169.253"]))
     search_domain = "f5.com"
     ntp_servers   = join(",", formatlist("\"%s\"", ["169.254.169.123"]))
@@ -445,7 +445,7 @@ data template_file clustermemberDO2 {
   count    = local.total_nics == 2 ? 1 : 0
   template = file("${path.module}/onboard_do_2nic.tpl")
   vars = {
-    hostname      = aws_eip.mgmt[0].public_dns
+    hostname      = length(aws_eip.mgmt) > 0 ? aws_eip.mgmt[0].public_dns : ""
     name_servers  = join(",", formatlist("\"%s\"", ["169.254.169.253"]))
     search_domain = "f5.com"
     ntp_servers   = join(",", formatlist("\"%s\"", ["169.254.169.123"]))
@@ -460,7 +460,7 @@ data template_file clustermemberDO3 {
   count    = local.total_nics >= 3 ? 1 : 0
   template = file("${path.module}/onboard_do_3nic.tpl")
   vars = {
-    hostname      = aws_eip.mgmt[0].public_dns
+    hostname      = length(aws_eip.mgmt) > 0 ? aws_eip.mgmt[0].public_dns : ""
     name_servers  = join(",", formatlist("\"%s\"", ["169.254.169.253"]))
     search_domain = "f5.com"
     ntp_servers   = join(",", formatlist("\"%s\"", ["169.254.169.123"]))

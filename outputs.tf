@@ -7,7 +7,7 @@ output mgmtPublicIP {
 # BIG-IP Management Public DNS
 output mgmtPublicDNS {
   description = "List of BIG-IP public DNS records for the management interfaces"
-  value       = flatten(aws_eip.mgmt[*].public_dns)
+  value       = length(local.mgmt_public_subnet_id) > 0 ? flatten(aws_eip.mgmt[*].public_dns) : tolist([])
 }
 
 # BIG-IP Management Port
