@@ -1,11 +1,11 @@
 # BIG-IP Management Public IP Addresses
 output mgmtPublicIP {
-  value = module.bigip.*.mgmtPublicIP
+  value = flatten(module.bigip.*.mgmtPublicIP)
 }
 
 # BIG-IP Management Public DNS Address
 output mgmtPublicDNS {
-  value = module.bigip.*.mgmtPublicDNS
+  value = flatten(module.bigip.*.mgmtPublicDNS)
 }
 
 # BIG-IP Management Port
