@@ -21,12 +21,17 @@ variable cidr {
 variable availabilityZones {
   description = "If you want the VM placed in an AWS Availability Zone, and the AWS region you are deploying to supports it, specify the numbers of the existing Availability Zone you want to use."
   type        = list
-  //default     = ["us-east-1a", "us-east-1b"]
+  default     = ["us-east-1a", "us-east-1b"]
 }
 variable AllowedIPs {}
 
 variable instance_count {
   description = "Number of Bigip instances to create( From terraform 0.13, module supports count feature to spin mutliple instances )"
   type        = number
+  default     = 1
 }
-
+variable custom_user_data {
+  description = "Provide a custom bash script or cloud-init script the BIG-IP will run on creation"
+  type        = string
+  default  =  null
+}

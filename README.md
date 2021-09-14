@@ -39,6 +39,13 @@ This module is supported in the following bigip and terraform version
 |:warning:  |End Users are responsible of the IAM profile setup, please find useful links for [IAM Setup](https://aws.amazon.com/premiumsupport/knowledge-center/restrict-ec2-iam/)|
 |:-----------|:----|
 
+## Custom User data
+
+* By default custom_user_data will be null,bigip module will use default f5_onboard.tmpl file contents for initial BIGIP onboard connfiguration
+
+* If users desire custom onboard configuration,we can use this variable and pass contents of custom script to the variable to have custom onboard bigip  configuration. ( some examples of custom runtime scripts are available in examples section )
+
+
 ## Example Usage
 
 We have provided some common deployment [examples](https://github.com/f5devcentral/terraform-aws-bigip-module/tree/master/examples)
@@ -68,6 +75,7 @@ module bigip {
   ec2_key_name           = aws_key_pair.generated_key.key_name
   mgmt_subnet_ids        = [{ "subnet_id" = "subnet_id_mgmt", "public_ip" = true, "private_ip_primary" =  ""}]
   mgmt_securitygroup_ids = ["securitygroup_id_mgmt"]
+  custom_user_data       = var.custom_user_data
 }
 
 #
@@ -81,6 +89,7 @@ module bigip {
   mgmt_securitygroup_ids      = ["securitygroup_id_mgmt"]
   external_subnet_ids         = [{ "subnet_id" = "subnet_id_external", "public_ip" = true, "private_ip_primary" = "", "private_ip_secondary" = ""}]
   external_securitygroup_ids  = ["securitygroup_id_external"]
+  custom_user_data            = var.custom_user_data
 }
 
 #
@@ -96,6 +105,7 @@ module bigip {
   external_securitygroup_ids  = ["securitygroup_id_external"]
   internal_subnet_ids         = [{"subnet_id" =  "subnet_id_internal", "public_ip"=false, "private_ip_primary" = ""}]
   internal_securitygroup_ids  = ["securitygropu_id_internal"]
+  custom_user_data            = var.custom_user_data
 }
 
 #
@@ -112,6 +122,7 @@ module bigip {
   external_securitygroup_ids  = ["securitygroup_id_external","securitygroup_id_external"]
   internal_subnet_ids         = [{"subnet_id" =  "subnet_id_internal", "public_ip"=false }]
   internal_securitygroup_ids  = ["securitygropu_id_internal"]
+  custom_user_data            = var.custom_user_data
 }
 
 #
@@ -124,6 +135,7 @@ module bigip {
   ec2_key_name           = aws_key_pair.generated_key.key_name
   mgmt_subnet_ids        = [{ "subnet_id" = "subnet_id_mgmt", "public_ip" = true, "private_ip_primary" =  ""}]
   mgmt_securitygroup_ids = ["securitygroup_id_mgmt"]
+  custom_user_data       = var.custom_user_data
 }
 
 ```
@@ -162,6 +174,7 @@ These variables must be set in the module block when using this module.
 | ec2_key_name 	| AWS EC2 Key name for SSH access,managing key is out of band module, user can reference this key name from [aws_key_pair](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/key_pair)	| string 	|  	|
 | mgmt\_subnet\_ids | Map with Subnet-id and public_ip as keys for the management subnet | `List of Maps` |
 | mgmt\_securitygroup\_ids | securitygroup\_ids for the management interface | `List` |
+| custom\_user\-data | Provide a custom bash script or cloud-init script the BIG-IP will run on creation | string  |   null   |
 
 #### Optional Input Variables
 
@@ -189,7 +202,6 @@ These variables have default values and don't have to be set to use this module.
 | internal\_subnet\_ids | The subnet id of the virtual network where the virtual machines will reside | `List of Maps` | [{ "subnet_id" = null, "public_ip" = null }] |
 | external\_securitygroup\_ids | The Network Security Group ids for external network | `List` | [] |
 | internal\_securitygroup\_ids | The Network Security Group ids for internal network | `List` | [] |
-
 ~> **NOTE:** For each external interface there will be one primary,secondary private ip will be assigned.
 
 #### Output Variables
