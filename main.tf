@@ -420,7 +420,7 @@ resource aws_instance f5_bigip {
     }
   }
   iam_instance_profile = var.aws_iam_instance_profile
-  user_data            = data.template_file.user_data_vm0.rendered
+  user_data            = coalesce(var.custom_user_data,data.template_file.user_data_vm0.rendered)
   provisioner "local-exec" {
     command = "sleep 420"
   }

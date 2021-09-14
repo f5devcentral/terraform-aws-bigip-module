@@ -23,7 +23,6 @@ variable availabilityZones {
   type        = list
   default     = ["us-east-1a", "us-east-1b"]
 }
-
 variable AllowedIPs {}
 
 variable instance_count {
@@ -31,4 +30,8 @@ variable instance_count {
   type        = number
   default     = 1
 }
-
+variable custom_user_data {
+  description = "Provide a custom bash script or cloud-init script the BIG-IP will run on creation"
+  type        = string
+  default  =  null
+}
