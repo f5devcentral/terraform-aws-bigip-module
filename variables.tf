@@ -175,5 +175,5 @@ variable onboard_log {
 variable custom_user_data {
   description = "Provide a custom bash script or cloud-init script the BIG-IP will run on creation"
   type        = string
-  //default     = null
+  default     = null
 }

@@ -17,14 +17,14 @@ output mgmtPort {
 }
 
 output f5_username {
-  value = var.f5_username
+  value = (var.custom_user_data == null) ? var.f5_username : "Username as provided in custom runtime-init"
 }
 
 output bigip_password {
   description = <<-EOT
  "Password for bigip user ( if dynamic_password is choosen it will be random generated password or if azure_keyvault is choosen it will be key vault secret name )
   EOT
-  value       = (var.f5_password == "") ? (var.aws_secretmanager_auth ? var.aws_secretmanager_secret_id : random_string.dynamic_password.result) : var.f5_password
+  value       = (var.custom_user_data == null) ? ((var.f5_password == "") ? (var.aws_secretmanager_auth ? var.aws_secretmanager_secret_id : random_string.dynamic_password.result) : var.f5_password) : "Password as provided in custom runtime-init"
 }
 
 // output private_addresses {
