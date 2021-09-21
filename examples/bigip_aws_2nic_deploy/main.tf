@@ -161,7 +161,6 @@ module bigip {
   mgmt_securitygroup_ids      = [module.mgmt-network-security-group.security_group_id]
   external_securitygroup_ids  = [module.external-network-security-group-public.security_group_id]
   external_subnet_ids         = [{ "subnet_id" = aws_subnet.external-public.id, "public_ip" = true, "private_ip_primary" = "", "private_ip_secondary" = "" }]
-  custom_user_data  = var.custom_user_data
 }
 
 resource "null_resource" "clusterDO" {

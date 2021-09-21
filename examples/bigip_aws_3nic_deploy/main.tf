@@ -185,7 +185,6 @@ module bigip {
   internal_securitygroup_ids  = [module.internal-network-security-group-public.security_group_id]
   external_subnet_ids         = [{ "subnet_id" = aws_subnet.external-public.id, "public_ip" = true, "private_ip_primary" = "", "private_ip_secondary" = "" }]
   internal_subnet_ids         = [{ "subnet_id" = aws_subnet.internal.id, "public_ip" = false, "private_ip_primary" = "" }]
-  custom_user_data            = var.custom_user_data
   //depends_on                  = [aws_secretsmanager_secret.bigip]
 }
 

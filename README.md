@@ -43,8 +43,20 @@ This module is supported in the following bigip and terraform version
 
 * By default custom_user_data will be null,bigip module will use default f5_onboard.tmpl file contents for initial BIGIP onboard connfiguration
 
-* If users desire custom onboard configuration,we can use this variable and pass contents of custom script to the variable to have custom onboard bigip  configuration. ( some examples of custom runtime scripts are available in examples section )
+* If users desire custom onboard configuration,we can use this variable and pass contents of custom script to the variable to have custom onboard bigip  configuration.( An example is provided in examples section )
 
+module bigip {
+  source                      = "../../"
+  prefix                      = "bigip-aws-3nic"
+  ec2_key_name                = aws_key_pair.generated_key.key_name
+  mgmt_subnet_ids             = [{ "subnet_id" = "subnet_id_mgmt", "public_ip" = true, "private_ip_primary" =  ""}]
+  mgmt_securitygroup_ids      = ["securitygroup_id_mgmt"]
+  external_subnet_ids         = [{ "subnet_id" = "subnet_id_external", "public_ip" = true, "private_ip_primary" = "", "private_ip_secondary" = ""}]
+  external_securitygroup_ids  = ["securitygroup_id_external"]
+  internal_subnet_ids         = [{"subnet_id" =  "subnet_id_internal", "public_ip"=false, "private_ip_primary" = ""}]
+  internal_securitygroup_ids  = ["securitygropu_id_internal"]
+  custom_user_data       = var.custom_user_data
+}
 
 ## Example Usage
 
@@ -75,7 +87,6 @@ module bigip {
   ec2_key_name           = aws_key_pair.generated_key.key_name
   mgmt_subnet_ids        = [{ "subnet_id" = "subnet_id_mgmt", "public_ip" = true, "private_ip_primary" =  ""}]
   mgmt_securitygroup_ids = ["securitygroup_id_mgmt"]
-  custom_user_data       = var.custom_user_data
 }
 
 #
@@ -89,7 +100,6 @@ module bigip {
   mgmt_securitygroup_ids      = ["securitygroup_id_mgmt"]
   external_subnet_ids         = [{ "subnet_id" = "subnet_id_external", "public_ip" = true, "private_ip_primary" = "", "private_ip_secondary" = ""}]
   external_securitygroup_ids  = ["securitygroup_id_external"]
-  custom_user_data            = var.custom_user_data
 }
 
 #
@@ -105,7 +115,6 @@ module bigip {
   external_securitygroup_ids  = ["securitygroup_id_external"]
   internal_subnet_ids         = [{"subnet_id" =  "subnet_id_internal", "public_ip"=false, "private_ip_primary" = ""}]
   internal_securitygroup_ids  = ["securitygropu_id_internal"]
-  custom_user_data            = var.custom_user_data
 }
 
 #
@@ -122,7 +131,6 @@ module bigip {
   external_securitygroup_ids  = ["securitygroup_id_external","securitygroup_id_external"]
   internal_subnet_ids         = [{"subnet_id" =  "subnet_id_internal", "public_ip"=false }]
   internal_securitygroup_ids  = ["securitygropu_id_internal"]
-  custom_user_data            = var.custom_user_data
 }
 
 #
@@ -135,7 +143,6 @@ module bigip {
   ec2_key_name           = aws_key_pair.generated_key.key_name
   mgmt_subnet_ids        = [{ "subnet_id" = "subnet_id_mgmt", "public_ip" = true, "private_ip_primary" =  ""}]
   mgmt_securitygroup_ids = ["securitygroup_id_mgmt"]
-  custom_user_data       = var.custom_user_data
 }
 
 ```
@@ -174,7 +181,6 @@ These variables must be set in the module block when using this module.
 | ec2_key_name 	| AWS EC2 Key name for SSH access,managing key is out of band module, user can reference this key name from [aws_key_pair](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/key_pair)	| string 	|  	|
 | mgmt\_subnet\_ids | Map with Subnet-id and public_ip as keys for the management subnet | `List of Maps` |
 | mgmt\_securitygroup\_ids | securitygroup\_ids for the management interface | `List` |
-| custom\_user\-data | Provide a custom bash script or cloud-init script the BIG-IP will run on creation | string  |   null   |
 
 #### Optional Input Variables
 
@@ -197,6 +203,7 @@ These variables have default values and don't have to be set to use this module.
 | CFE_URL | URL to download the BIG-IP Cloud Failover Extension module | `string` | latest |
 | INIT_URL | URL to download the BIG-IP runtime init module | `string` | latest |
 | libs\_dir | Directory on the BIG-IP to download the A&O Toolchain into | `string` | /config/cloud/aws/node_modules |
+| custom\_user\-data | Provide a custom bash script or cloud-init script the BIG-IP will run on creation | string  |   null   |
 | onboard\_log | Directory on the BIG-IP to store the cloud-init logs | `string` | /var/log/startup-script.log |
 | external\_subnet\_ids | he subnet id of the virtual network where the virtual machines will reside | `List of Maps` | [{ "subnet_id" = null, "public_ip" = null }] |
 | internal\_subnet\_ids | The subnet id of the virtual network where the virtual machines will reside | `List of Maps` | [{ "subnet_id" = null, "public_ip" = null }] |
