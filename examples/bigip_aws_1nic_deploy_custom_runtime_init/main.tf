@@ -185,7 +185,7 @@ data "template_file" "user_data_vm0" {
     bigip_username         = "bigipuser"
     ssh_keypair            = fileexists("~/.ssh/id_rsa.pub") ? file("~/.ssh/id_rsa.pub") : ""
     aws_secretmanager_auth = false
-    bigip_password         = "F5site02"
+    bigip_password         = "xxxxxx"
     INIT_URL               = "https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.2.1/dist/f5-bigip-runtime-init-1.2.1-1.gz.run",
     DO_URL                 = "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.21.0/f5-declarative-onboarding-1.21.0-3.noarch.rpm",
     DO_VER                 = "v1.21.0"
