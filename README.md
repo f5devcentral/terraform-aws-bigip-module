@@ -45,6 +45,7 @@ This module is supported in the following bigip and terraform version
 
 * If users desire custom onboard configuration,we can use this variable and pass contents of custom script to the variable to have custom onboard bigip  configuration.( An example is provided in examples section )
 
+```
 module bigip {
   source                      = "../../"
   prefix                      = "bigip-aws-3nic"
@@ -57,6 +58,7 @@ module bigip {
   internal_securitygroup_ids  = ["securitygropu_id_internal"]
   custom_user_data       = var.custom_user_data
 }
+```
 
 ## Example Usage
 
