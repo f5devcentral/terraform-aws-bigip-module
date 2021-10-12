@@ -12,7 +12,7 @@ resource "random_id" "id" {
 #
 # Create random password for BIG-IP
 #
-resource random_string password {
+resource "random_string" "password" {
   length      = 16
   min_upper   = 1
   min_lower   = 1
@@ -117,14 +117,14 @@ module "vpc" {
     Environment = "dev"
   }
 }
-resource aws_internet_gateway gw {
+resource "aws_internet_gateway" "gw" {
   vpc_id = module.vpc.vpc_id
 
   tags = {
     Name = "default"
   }
 }
-resource aws_route_table internet-gw {
+resource "aws_route_table" "internet-gw" {
   vpc_id = module.vpc.vpc_id
   route {
     cidr_block = "0.0.0.0/0"
@@ -132,7 +132,7 @@ resource aws_route_table internet-gw {
   }
 }
 
-resource aws_subnet mgmt {
+resource "aws_subnet" "mgmt" {
   vpc_id            = module.vpc.vpc_id
   cidr_block        = cidrsubnet(var.cidr, 8, 1)
   availability_zone = var.availabilityZones[0]
@@ -149,7 +149,7 @@ resource "aws_route_table_association" "route_table_mgmt" {
 #
 # Create a security group for BIG-IP Management
 #
-module mgmt-network-security-group {
+module "mgmt-network-security-group" {
   source              = "terraform-aws-modules/security-group/aws"
   name                = format("%s-mgmt-nsg-%s", var.prefix, random_id.id.hex)
   description         = "Security group for BIG-IP Management"
@@ -161,12 +161,12 @@ module mgmt-network-security-group {
   egress_rules       = ["all-all"]
 }
 
-resource tls_private_key example {
+resource "tls_private_key" "example" {
   algorithm = "RSA"
   rsa_bits  = 4096
 }
 
-resource aws_key_pair generated_key {
+resource "aws_key_pair" "generated_key" {
   key_name   = format("%s-%s-%s", var.prefix, var.ec2_key_name, random_id.id.hex)
   public_key = tls_private_key.example.public_key_openssh
 }
@@ -174,7 +174,7 @@ resource aws_key_pair generated_key {
 #
 # Create BIG-IP
 #
-module bigip {
+module "bigip" {
   source                 = "../../"
   count                  = var.instance_count
   prefix                 = format("%s-1nic", var.prefix)

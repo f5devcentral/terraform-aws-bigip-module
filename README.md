@@ -194,7 +194,6 @@ These variables have default values and don't have to be set to use this module.
 | f5\_password | Password of the F5  BIG-IP that will be deployed | `string` | "" |
 | ec2_instance_type 	| AWS EC2 instance type 	| string 	| m5.large 	|
 | f5_ami_search_name 	| BIG-IP AMI name to search for 	| string 	| F5 BIGIP-* PAYG-Best 200Mbps* 	|
-| mgmt_eip 	| Enable an Elastic IP address on the management interface 	| bool 	| TRUE 	|
 | aws_secretmanager_auth 	| Whether to use key vault to pass authentication 	| bool 	| FALSE 	|
 | aws_secretmanager_secret_id 	| AWS Secret Manager Secret ID that stores the BIG-IP password 	| string 	|  	|
 | aws_iam_instance_profile 	| AWS IAM instance profile that can be associate for BIGIP with required permissions 	| string 	|  	|
@@ -222,8 +221,9 @@ These variables have default values and don't have to be set to use this module.
 | mgmtPort | Mgmt Port |
 | f5\_username | BIG-IP username |
 | bigip\_password | BIG-IP Password (if dynamic_password is choosen it will be random generated password or if aws_secretmanager_auth is choosen it will be aws_secretsmanager_secret_version secret string ) |
-| private\_addresses | List of BIG-IP private addresses |
-| public\_addresses | List of BIG-IP public addresses |
+| private\_addresses | List of BIG-IP private addresses map|
+| public\_addresses | List of BIG-IP public addresses map|
+| bigip\_instance\_ids | List of BIG-IP AWS Instance IDs Created |
 
 ~> **NOTE:** A local json file will get generated which contains the DO declaration
 
