@@ -151,6 +151,14 @@ locals {
   //bigip_nics_map   = concat(data.aws_network_interfaces.bigip_nic.*.private_ip)
   instance_prefix = format("%s-%s", var.prefix, random_id.module_id.hex)
 
+  tags = merge(var.tags,{ 
+    Prefix = format("%s", local.instance_prefix)
+    }
+  )
+
+
+
+
 }
 
 #
@@ -208,10 +216,10 @@ resource "aws_network_interface" "mgmt" {
   subnet_id       = local.bigip_map["mgmt_subnet_ids"][count.index]["subnet_id"]
   private_ips     = [local.mgmt_public_private_ip_primary[count.index]]
   security_groups = var.mgmt_securitygroup_ids
-  tags = {
+  tags = merge(local.tags,{
     Name   = format("%s-%d", "BIGIP-Managemt-Interface", count.index)
-    Prefix = format("%s", local.instance_prefix)
   }
+  )
 }
 
 #This resource is for dynamic  primary and secondary private ips  
@@ -220,10 +228,10 @@ resource "aws_network_interface" "mgmt1" {
   subnet_id         = local.bigip_map["mgmt_subnet_ids"][count.index]["subnet_id"]
   security_groups   = var.mgmt_securitygroup_ids
   private_ips_count = 0
-  tags = {
+  tags = merge(local.tags,{
     Name   = format("%s-%d", "BIGIP-Managemt-Interface", count.index)
-    Prefix = format("%s", local.instance_prefix)
   }
+  )
 }
 
 #
@@ -234,6 +242,10 @@ resource "aws_eip" "mgmt" {
   #network_interface = aws_network_interface.mgmt[count.index].id
   network_interface = length(compact(local.mgmt_public_private_ip_primary)) > 0 ? aws_network_interface.mgmt[count.index].id : aws_network_interface.mgmt1[count.index].id
   vpc               = true
+  tags = merge(local.tags,{
+    Name   = format("%s-%d", "BIGIP-Managemt-PublicIp", count.index)
+  }
+  )
 }
 
 #
@@ -245,6 +257,10 @@ resource "aws_eip" "ext-pub" {
   network_interface = length(compact(local.external_public_private_ip_primary)) > 0 ? aws_network_interface.public[count.index].id : aws_network_interface.public1[count.index].id
   vpc               = true
   depends_on        = [aws_eip.mgmt]
+  tags = merge(local.tags,{
+    Name   = format("%s-%d", "BIGIP-External-PublicIp", count.index)
+  }
+  )
 }
 
 #
@@ -255,6 +271,10 @@ resource "aws_eip" "vip" {
   network_interface         = length(compact(local.external_public_private_ip_primary)) > 0 ? aws_network_interface.public[0].id : aws_network_interface.public1[0].id
   vpc                       = true
   associate_with_private_ip = length(compact(local.external_public_private_ip_primary)) > 0 ? element(compact([for x in tolist(aws_network_interface.public[0].private_ips) : x == aws_network_interface.public[0].private_ip ? "" : x]), 0) : element(compact([for x in tolist(aws_network_interface.public1[0].private_ips) : x == aws_network_interface.public1[0].private_ip ? "" : x]), 0)
+  tags = merge(local.tags,{
+    Name   = format("%s-%d", "BIGIP-2ndExternal-PublicIp", count.index)
+  }
+  )
 }
 
 #
@@ -270,10 +290,10 @@ resource "aws_network_interface" "public" {
   private_ips       = [local.external_public_private_ip_primary[count.index], local.external_public_private_ip_secondary[count.index]]
   source_dest_check = var.external_source_dest_check
   # private_ips_count = 1
-  tags = {
+  tags = merge(local.tags,{
     Name   = format("%s-%d", "BIGIP-External-Public-Interface", count.index)
-    Prefix = format("%s", local.instance_prefix)
   }
+  )
 }
 
 #This resource is for dynamic  primary and secondary private ips
@@ -285,10 +305,10 @@ resource "aws_network_interface" "public1" {
   security_groups   = var.external_securitygroup_ids
   source_dest_check = var.external_source_dest_check
   private_ips_count = 1
-  tags = {
+  tags = merge(local.tags,{
     Name   = format("%s-%d", "BIGIP-External-Public-Interface", count.index)
-    Prefix = format("%s", local.instance_prefix)
   }
+  )
 }
 
 #
@@ -303,10 +323,10 @@ resource "aws_network_interface" "external_private" {
   security_groups = var.external_securitygroup_ids
   private_ips     = [local.external_private_ip_primary[count.index], local.external_private_ip_secondary[count.index]]
   #  private_ips_count = 1
-  tags = {
+  tags = merge(local.tags,{
     Name   = format("%s-%d", "BIGIP-External-Private-Interface", count.index)
-    Prefix = format("%s", local.instance_prefix)
   }
+  )
 }
 
 #This resource is for dynamic  primary and secondary private ips
@@ -317,10 +337,10 @@ resource "aws_network_interface" "external_private1" {
   subnet_id         = local.external_private_subnet_id[count.index]
   security_groups   = var.external_securitygroup_ids
   private_ips_count = 1
-  tags = {
+  tags = merge(local.tags,{
     Name   = format("%s-%d", "BIGIP-External-Private-Interface", count.index)
-    Prefix = format("%s", local.instance_prefix)
   }
+  )
 }
 #
 # Create Private Network Interfaces
@@ -333,10 +353,10 @@ resource "aws_network_interface" "private" {
   security_groups   = var.internal_securitygroup_ids
   private_ips       = [local.internal_private_ip_primary[count.index]]
   source_dest_check = var.internal_source_dest_check
-  tags = {
+  tags = merge(local.tags,{
     Name   = format("%s-%d", "BIGIP-Internal-Interface", count.index)
-    Prefix = format("%s", local.instance_prefix)
   }
+  )
 }
 
 #This resource is for dynamic  primary and secondary private ips
@@ -347,10 +367,10 @@ resource "aws_network_interface" "private1" {
   security_groups   = var.internal_securitygroup_ids
   private_ips_count = 0
   source_dest_check = var.internal_source_dest_check
-  tags = {
+  tags = merge(local.tags,{
     Name   = format("%s-%d", "BIGIP-Internal-Interface", count.index)
-    Prefix = format("%s", local.instance_prefix)
   }
+  )
 }
 
 data "template_file" "user_data_vm0" {
@@ -424,9 +444,10 @@ resource aws_instance f5_bigip {
   provisioner "local-exec" {
     command = "sleep 420"
   }
-  tags = {
-    Name = format("%s", local.instance_prefix)
+  tags = merge(local.tags,{
+    Name = format("BIGIP-Instance-%s", local.instance_prefix)
   }
+  )
   depends_on = [aws_eip.mgmt, aws_network_interface.public, aws_network_interface.private]
 }
 
