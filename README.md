@@ -221,9 +221,19 @@ These variables have default values and don't have to be set to use this module.
 | mgmtPort | Mgmt Port |
 | f5\_username | BIG-IP username |
 | bigip\_password | BIG-IP Password (if dynamic_password is choosen it will be random generated password or if aws_secretmanager_auth is choosen it will be aws_secretsmanager_secret_version secret string ) |
-| private\_addresses | List of BIG-IP private addresses map|
-| public\_addresses | List of BIG-IP public addresses map|
+| private\_addresses | It is List of Maps all privates address assigned for Mgmt/External-Public/External-private/Internal|
+| public\_addresses | It is List of Maps all public address assigned for External-public-primary/ External-public-secondary|
 | bigip\_instance\_ids | List of BIG-IP AWS Instance IDs Created |
+
+~ **NOTE:**
+  IF you want to access External interface private IPs, you need to filter it form `private_addresses` map like below:
+
+  ```hcl
+    output "external_public_primary_private_ip" {
+      description = "List of BIG-IP private addresses"
+      value       = flatten([for i in range(length(module.bigip.*.private_addresses)) : module.bigip.*.private_addresses[i]["public_private"]["private_ip"]])
+    }
+  ```
 
 ~> **NOTE:** A local json file will get generated which contains the DO declaration
 
