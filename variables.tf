@@ -171,3 +171,9 @@ variable "custom_user_data" {
   type        = string
   default     = null
 }
+
+variable tags {
+  description = "key:value tags to apply to resources built by the module"
+  type        = map
+  default     = {}
+}
