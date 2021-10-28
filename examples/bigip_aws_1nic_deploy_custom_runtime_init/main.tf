@@ -12,7 +12,7 @@ resource "random_id" "id" {
 #
 # Create random password for BIG-IP
 #
-resource random_string password {
+resource "random_string" "password" {
   length      = 16
   min_upper   = 1
   min_lower   = 1
@@ -197,7 +197,7 @@ data "template_file" "user_data_vm0" {
 #
 # Create BIG-IP
 #
-module bigip {
+module "bigip" {
   source       = "../../"
   count        = var.instance_count
   prefix       = format("%s-1nic", var.prefix)
