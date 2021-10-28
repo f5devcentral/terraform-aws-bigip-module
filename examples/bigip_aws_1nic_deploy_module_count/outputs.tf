@@ -43,10 +43,6 @@ output "public_addresses" {
   value       = module.bigip.*.public_addresses
 }
 
-output "aws_instance_metadata" {
-  value = module.bigip.*.aws_instance_metadata
-}
-
 // output tls_privatekey {
 //   value = tls_private_key.example.private_key_pem
 // }
