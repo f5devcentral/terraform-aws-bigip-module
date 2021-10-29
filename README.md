@@ -1,3 +1,5 @@
+## This Repo has been Archived, and moved to: https://github.com/F5Networks/terraform-aws-bigip-module for Supported Module
+
 ## Deploys BIG-IP in AWS Cloud
 
 This Terraform module deploys N-nic F5 BIG-IP in AWS cloud,and with module `count` feature we can also deploy multiple instances of BIG-IP.
